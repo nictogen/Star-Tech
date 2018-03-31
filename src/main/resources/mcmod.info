@@ -1,0 +1,16 @@
+[
+{
+  "modid": "star-tech",
+  "name": "Star Tech, Man! Legendary Mod?",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Nictogen"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
