@@ -1,12 +1,12 @@
 package com.nic.st.entity;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -19,6 +19,8 @@ import java.util.Random;
  */
 public class EntityBullet extends EntityThrowable
 {
+	public double damage = 1.0;
+
 	public EntityBullet(World worldIn)
 	{
 		super(worldIn);
@@ -37,6 +39,10 @@ public class EntityBullet extends EntityThrowable
 	@Override public void onUpdate()
 	{
 		super.onUpdate();
+		if (this.ticksExisted > 80)
+		{
+			onImpact(null);
+		}
 	}
 
 	/**
@@ -44,20 +50,34 @@ public class EntityBullet extends EntityThrowable
 	 */
 	protected void onImpact(RayTraceResult result)
 	{
-		if (result.entityHit != null)
-		{
-			int i = 0;
-
-			if (result.entityHit instanceof EntityBlaze)
-			{
-				i = 3;
-			}
-
-			result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.getThrower()), (float) i);
-		}
-
 		if (!this.world.isRemote)
 		{
+			for (EntityLivingBase entitylivingbase : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(5.0D)))
+			{
+				if (entitylivingbase != this.thrower && this.getDistanceSq(entitylivingbase) <= 25.0D)
+				{
+					boolean flag = false;
+
+					for (int i = 0; i < 2; ++i)
+					{
+						RayTraceResult raytraceresult = this.world.rayTraceBlocks(getPositionVector(),
+								new Vec3d(entitylivingbase.posX, entitylivingbase.posY + (double) entitylivingbase.height * 0.5D * (double) i,
+										entitylivingbase.posZ), false, true, false);
+
+						if (raytraceresult == null || raytraceresult.typeOfHit == RayTraceResult.Type.MISS)
+						{
+							flag = true;
+							break;
+						}
+					}
+
+					if (flag)
+					{
+						float f1 = (15f - this.getDistance(entitylivingbase));
+						entitylivingbase.attackEntityFrom(DamageSource.causeThrownDamage(this, thrower), (float) (f1 * damage));
+					}
+				}
+			}
 			this.world.setEntityState(this, (byte) 3);
 			this.setDead();
 		}

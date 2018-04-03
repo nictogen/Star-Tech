@@ -27,7 +27,7 @@ public class BulletRenderer extends RenderSnowball<EntityBullet>
 		double pY = entity.prevPosY + (entity.posY - entity.prevPosY) * partialTicks;
 		double pZ = entity.prevPosZ + (entity.posZ - entity.prevPosZ) * partialTicks;
 
-		Particle p = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.FIREWORKS_SPARK.getParticleID(), pX, pY, pZ, 0, 0.1, 0);
+		Particle p = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.FIREWORKS_SPARK.getParticleID(), pX, pY, pZ, 0, 0.0, 0);
 		if (p != null)
 		{
 			p.setRBGColorF(1.0f, 0.0f, 0.0f);
@@ -39,7 +39,7 @@ public class BulletRenderer extends RenderSnowball<EntityBullet>
 		{
 			p = Minecraft.getMinecraft().effectRenderer
 					.spawnEffectParticle(EnumParticleTypes.FIREWORKS_SPARK.getParticleID(), pX + r.nextGaussian() * 0.025, pY + r.nextGaussian() * 0.025,
-							pZ + r.nextGaussian() * 0.025, 0, 0.1, 0);
+							pZ + r.nextGaussian() * 0.025, 0, 0.0, 0);
 			if (p != null)
 			{
 				p.setRBGColorF(1.0f, r.nextFloat() * 0.5f + 0.3f, 0.0f);

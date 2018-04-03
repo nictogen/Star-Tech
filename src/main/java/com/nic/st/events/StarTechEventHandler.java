@@ -84,9 +84,9 @@ public class StarTechEventHandler
 		if (event.getEntityPlayer().getHeldItem(event.getHand()).getItem() instanceof ItemPrintedGun && event.getWorld()
 				.getTileEntity(event.getPos().down()) instanceof BlockBlueprintCreator.TileEntityBlueprintCreator)
 		{
-			ItemPrintedGun.getGunData(event.getEntityPlayer().getHeldItem(event.getHand()))
-					.setByteArray("voxels",
-							((BlockBlueprintCreator.TileEntityBlueprintCreator) event.getWorld().getTileEntity(event.getPos().down())).voxels.clone());
+			ItemPrintedGun
+					.createGunData(((BlockBlueprintCreator.TileEntityBlueprintCreator) event.getWorld().getTileEntity(event.getPos().down())).voxels.clone(),
+							event.getEntityPlayer().getHeldItem(event.getHand()));
 			return;
 		}
 
