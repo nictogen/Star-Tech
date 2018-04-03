@@ -6,14 +6,20 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
 
 /**
  * Created by Nictogen on 4/1/18.
  */
 public class BlockHologram extends Block
 {
+	public static final AxisAlignedBB HOLO_BOX = new AxisAlignedBB(0.25, 1.5, 0, 0.75, 2, 1);
+
 	public BlockHologram()
 	{
 		super(Material.IRON);
@@ -27,6 +33,16 @@ public class BlockHologram extends Block
 		if (world.isRemote)
 			Utils.breakVoxels(world, pos, player);
 		return false;
+	}
+
+	@Override public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+	{
+		return HOLO_BOX.offset(0, -1, 0);
+	}
+
+	@Nullable @Override public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
+	{
+		return HOLO_BOX.offset(0, -1, 0);
 	}
 
 	@Override public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer)

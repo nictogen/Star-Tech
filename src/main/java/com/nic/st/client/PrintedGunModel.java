@@ -27,6 +27,7 @@ import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import javax.vecmath.Matrix4f;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -53,7 +54,7 @@ public class PrintedGunModel implements IBakedModel
 		GlStateManager.translate(0.5F, 0.5F, 0.5F);
 		GlStateManager.scale(-1.0F, -1.0F, 1.0F);
 		GlStateManager.rotate(180f, 1f, 0f, 0f);
-		GlStateManager.translate(-0.25f, 0f, 0.9f);
+		GlStateManager.translate(-0.25f, -0.1f, 0.9f);
 
 		render();
 		GlStateManager.popMatrix();
@@ -78,6 +79,7 @@ public class PrintedGunModel implements IBakedModel
 			Minecraft.getMinecraft().renderEngine.bindTexture(BlueprintCreatorRenderer.TEXTURE);
 
 			GlStateManager.disableLighting();
+			GlStateManager.disableCull();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferbuilder = tessellator.getBuffer();
 			bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
@@ -87,15 +89,22 @@ public class PrintedGunModel implements IBakedModel
 				float shade = ((float) r.nextInt(32)) * 0.001953125f;
 				if (voxels[i] != 0)
 				{
+					Color color = (voxels[i] == 1) ?
+							new Color(1.0f - shade, 0.85f - shade, 0.0f) :
+							(voxels[i] == 2) ?
+									new Color(0.5f - shade, 0.5f - shade, 0.5f - shade) :
+									(voxels[i] == 3) ?
+											new Color(0.3f - shade, 0.3f - shade, 0.3f - shade) :
+											new Color(0.2f - shade, 0.4f - shade, 1.0f - shade);
 					Utils.addTexturedBoxVertices(bufferbuilder,
-							voxel.offset(vX * 0.0625, vY * 0.0625, -vZ * 0.0625), 0.3f,
-							0.3f, 0.8f - shade,
+							voxel.offset(vX * 0.0625, vY * 0.0625, -vZ * 0.0625), ((float) color.getRed()) / 255f,
+							((float) color.getGreen()) / 255f, ((float) color.getBlue()) / 255f,
 							1.0f);
 				}
-
 			}
 			tessellator.draw();
 			GlStateManager.enableLighting();
+			GlStateManager.enableCull();
 		}
 	}
 

@@ -3,25 +3,32 @@ package com.nic.st;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.client.BlueprintCreatorRenderer;
+import com.nic.st.client.BulletRenderer;
 import com.nic.st.client.PrintedGunModel;
+import com.nic.st.entity.EntityBullet;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.lang.reflect.Field;
 
@@ -38,6 +45,14 @@ public class StarTech
 	{
 		event.getRegistry().register(new BlockBlueprintCreator());
 		event.getRegistry().register(new BlockHologram());
+	}
+
+	@SubscribeEvent
+	public static void registerEntityEntry(RegistryEvent.Register<EntityEntry> event)
+	{
+		event.getRegistry().register(
+				EntityEntryBuilder.create().entity(EntityBullet.class).id(new ResourceLocation(MODID, "bullet"), 0).name("bullet").tracker(80, 10, true)
+						.build());
 	}
 
 	@SubscribeEvent
@@ -88,7 +103,11 @@ public class StarTech
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
+		if (event.getSide() == Side.CLIENT)
+		{
+			ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
+			RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, BulletRenderer::new);
+		}
 	}
 
 	@EventHandler

@@ -16,12 +16,13 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
+import static com.nic.st.blocks.BlockHologram.HOLO_BOX;
+
 /**
  * Created by Nictogen on 4/1/18.
  */
 public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 {
-	public static final AxisAlignedBB HOLO_BOX = new AxisAlignedBB(0.25, 1, 0, 0.75, 1.5, 1);
 
 	public BlockBlueprintCreator()
 	{
@@ -62,6 +63,7 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 	public static class TileEntityBlueprintCreator extends TileEntity implements ITickable
 	{
 		public byte[] voxels = new byte[1024];
+		public int buttonDown = 0;
 
 		public TileEntityBlueprintCreator()
 		{
@@ -71,7 +73,7 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 		{
 			if (getWorld().isAirBlock(getPos().up()))
 			{
-				getWorld().setBlockState(pos, StarTech.Blocks.hologram.getDefaultState());
+				getWorld().setBlockState(pos.up(), StarTech.Blocks.hologram.getDefaultState());
 			}
 		}
 
@@ -79,12 +81,14 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 		{
 			super.readFromNBT(compound);
 			voxels = compound.getByteArray("voxels");
+			buttonDown = compound.getInteger("buttonDown");
 		}
 
 		@Override public NBTTagCompound writeToNBT(NBTTagCompound compound)
 		{
 			NBTTagCompound nbt = super.writeToNBT(compound);
 			nbt.setByteArray("voxels", voxels);
+			nbt.setInteger("buttonDown", buttonDown);
 			return nbt;
 		}
 

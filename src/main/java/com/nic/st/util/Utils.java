@@ -1,6 +1,7 @@
 package com.nic.st.util;
 
 import com.nic.st.blocks.BlockBlueprintCreator;
+import com.nic.st.blocks.BlockHologram;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,10 +40,10 @@ public class Utils
 
 		for (BlockBlueprintCreator.TileEntityBlueprintCreator creator : creators)
 		{
-			int voxel = getEmptyVoxel(BlockBlueprintCreator.HOLO_BOX.offset(creator.getPos()), player.getPositionEyes(0.0f), hitVec, creator.voxels,
+			int voxel = getEmptyVoxel(BlockHologram.HOLO_BOX.offset(creator.getPos()), player.getPositionEyes(0.0f), hitVec, creator.voxels,
 					creator.getPos());
 			if (voxel != -1)
-				creator.voxels[voxel] = 1;
+				creator.voxels[voxel] = (byte) (creator.buttonDown + 1);
 
 			creator.markDirty();
 			IBlockState state = creator.getWorld().getBlockState(creator.getPos());
@@ -73,7 +74,7 @@ public class Utils
 
 		for (BlockBlueprintCreator.TileEntityBlueprintCreator creator : creators)
 		{
-			int voxel = getVoxel(BlockBlueprintCreator.HOLO_BOX.offset(creator.getPos()), player.getPositionEyes(0.0f), hitVec, creator.voxels,
+			int voxel = getVoxel(BlockHologram.HOLO_BOX.offset(creator.getPos()), player.getPositionEyes(0.0f), hitVec, creator.voxels,
 					creator.getPos());
 			if (voxel != -1)
 				creator.voxels[voxel] = 0;
@@ -98,7 +99,7 @@ public class Utils
 		{
 			if (voxels[i] != 0)
 			{
-				AxisAlignedBB current = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1 + y * 0.0625, pos.getZ() + z * 0.0625);
+				AxisAlignedBB current = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625);
 				RayTraceResult currentResult = current.calculateIntercept(origin, end);
 				if (currentResult != null)
 				{
@@ -228,7 +229,7 @@ public class Utils
 
 		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
 		{
-			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1 + y * 0.0625, pos.getZ() + z * 0.0625);
+			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625);
 			if (voxels[i] != 0)
 			{
 				RayTraceResult cvResult = voxelPos.calculateIntercept(origin, end);
@@ -247,7 +248,7 @@ public class Utils
 
 		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
 		{
-			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1 + y * 0.0625, pos.getZ() + z * 0.0625);
+			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625);
 			if (voxels[i] == 0)
 			{
 				RayTraceResult fvResult = voxelPos.calculateIntercept(origin, end);
