@@ -1,3 +1,5 @@
+**Notice: Make sure to design your guns with the handle on the left and the shooty end on the right (while looking at the buttons of the designer).**
+
 What? Come on man, you've never hear of Star Tech? Fine, I'll explain it to you. It's a mod that I made for Modjam, loosely based on Guardians of the Galaxy 2. It lets you design and 3d print space guns.
 
 The first thing you're going to want to do in it is craft the blueprint creator
