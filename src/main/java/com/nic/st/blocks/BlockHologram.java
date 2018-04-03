@@ -35,6 +35,16 @@ public class BlockHologram extends Block
 		return false;
 	}
 
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
+	{
+		if (!worldIn.isRemote)
+		{
+			if (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockBlueprintCreator)
+				return;
+			worldIn.setBlockToAir(pos);
+		}
+	}
+
 	@Override public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
 	{
 		return HOLO_BOX.offset(0, -1, 0);
