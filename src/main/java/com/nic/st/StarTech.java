@@ -3,28 +3,18 @@ package com.nic.st;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
-import com.nic.st.client.BlueprintCreatorRenderer;
-import com.nic.st.client.BulletRenderer;
-import com.nic.st.client.PrintedGunModel;
-import com.nic.st.client.PrinterRenderer;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -32,7 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -48,6 +37,9 @@ public class StarTech
 	public static final String MODID = "star-tech";
 	public static final String NAME = "Star Tech, Man! The Legendary Mod?";
 	public static final String VERSION = "1.0";
+
+	@SidedProxy(clientSide = "com.nic.st.ClientProxy", serverSide = "com.nic.st.CommonProxy")
+	public static CommonProxy proxy;
 
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event)
@@ -79,47 +71,17 @@ public class StarTech
 		}
 	}
 
-	@SubscribeEvent public static void registerModels(ModelRegistryEvent ev)
+	@SubscribeEvent
+	public static void registerSounds(RegistryEvent.Register<SoundEvent> event)
 	{
-		for (Field f : Items.class.getDeclaredFields())
-		{
-			try
-			{
-				Item item = (Item) f.get(null);
-				ModelResourceLocation loc = new ModelResourceLocation(item.getRegistryName(), "inventory");
-				ModelLoader.setCustomModelResourceLocation(item, 0, loc);
-			}
-			catch (IllegalAccessException | ClassCastException e)
-			{
-				throw new RuntimeException("Incorrect field in item sub-class", e);
-			}
-		}
-
-		for (Field f : Blocks.class.getDeclaredFields())
-		{
-			try
-			{
-				Block block = (Block) f.get(null);
-				Item item = Item.getItemFromBlock(block);
-				ModelResourceLocation loc = new ModelResourceLocation(item.getRegistryName() + (f.isAnnotationPresent(OBJ.class) ? ".obj" : ""), "inventory");
-				ModelLoader.setCustomModelResourceLocation(item, 0, loc);
-			}
-			catch (IllegalAccessException | ClassCastException e)
-			{
-				throw new RuntimeException("Incorrect field in item sub-class", e);
-			}
-		}
+		Sounds.shoot = new SoundEvent(new ResourceLocation(MODID, "shoot")).setRegistryName(MODID, "shoot");
+		event.getRegistry().register(Sounds.shoot);
 	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		if (event.getSide() == Side.CLIENT)
-		{
-			ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
-			RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, BulletRenderer::new);
-			OBJLoader.INSTANCE.addDomain(MODID);
-		}
+		proxy.preInit(event);
 	}
 
 	@EventHandler
@@ -132,24 +94,15 @@ public class StarTech
 	@EventHandler
 	public void init(FMLPostInitializationEvent event)
 	{
-		if (event.getSide().isClient())
-		{
-			ClientRegistry.bindTileEntitySpecialRenderer(BlockBlueprintCreator.TileEntityBlueprintCreator.class, new BlueprintCreatorRenderer());
-			ClientRegistry.bindTileEntitySpecialRenderer(BlockPrinter.TileEntityPrinter.class, new PrinterRenderer());
-		}
+		proxy.postInit(event);
 	}
 
 	@Retention(value = RUNTIME)
 	@Target(value = FIELD)
-	private @interface OBJ
+	public @interface OBJ
 	{
 	}
 
-	@SubscribeEvent
-	public void bakeModel(ModelBakeEvent event)
-	{
-		event.getModelRegistry().putObject(new ModelResourceLocation(Items.printedGun.getRegistryName(), "inventory"), new PrintedGunModel());
-	}
 
 	@GameRegistry.ObjectHolder(MODID)
 	public static class Blocks
@@ -173,6 +126,11 @@ public class StarTech
 		public static final Item blueprintCreator = null;
 
 		public static final Item blueprint = null;
+	}
+
+	public static class Sounds
+	{
+		public static SoundEvent shoot = null;
 	}
 
 }

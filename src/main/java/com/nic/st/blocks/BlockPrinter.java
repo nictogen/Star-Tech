@@ -6,6 +6,7 @@ import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemAir;
 import net.minecraft.item.ItemStack;
@@ -32,6 +33,8 @@ public class BlockPrinter extends Block
 		super(Material.IRON);
 		setRegistryName(StarTech.MODID, "printer");
 		setUnlocalizedName("printer");
+		setHardness(2.0f).setResistance(10.0f);
+		setCreativeTab(CreativeTabs.REDSTONE);
 	}
 
 	@Deprecated

@@ -1,0 +1,12 @@
+{
+  "shoot": {
+    "category": "players",
+    "subtitle": "Space Gun Shooting",
+    "sounds": [
+      {
+        "name": "star-tech:shoot",
+        "stream": false
+      }
+    ]
+  }
+}

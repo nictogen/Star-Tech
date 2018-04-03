@@ -78,6 +78,8 @@ public class EntityBullet extends EntityThrowable
 					}
 				}
 			}
+			//			this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 1.0F, (1.0F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F) * 0.7F);
+
 			this.world.setEntityState(this, (byte) 3);
 			this.setDead();
 		}

@@ -4,6 +4,7 @@ import com.nic.st.StarTech;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -28,6 +29,8 @@ public class BlockBlueprintCreator extends Block
 		super(Material.IRON);
 		setRegistryName(StarTech.MODID, "blueprint_creator");
 		setUnlocalizedName("blueprint_creator");
+		setHardness(2.0f).setResistance(10.0f);
+		setCreativeTab(CreativeTabs.REDSTONE);
 	}
 
 	@Deprecated

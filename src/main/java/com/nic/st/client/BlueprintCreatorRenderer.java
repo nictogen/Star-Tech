@@ -3,6 +3,7 @@ package com.nic.st.client;
 import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
+import com.nic.st.util.ClientUtils;
 import com.nic.st.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -30,11 +31,40 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 	public void render(BlockBlueprintCreator.TileEntityBlueprintCreator te, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
 	{
 		Tessellator tessellator = Tessellator.getInstance();
+
+		if (te == null)
+		{
+			GlStateManager.disableCull();
+			AxisAlignedBB creatorBox = new AxisAlignedBB(0, 0, 0, 1, 0.75, 1);
+			AxisAlignedBB buttonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.85, 0.1);
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0.15, 0.2, 0.5);
+			GlStateManager.rotate(90f, 0f, 1f, 0f);
+			GlStateManager.scale(0.75, 0.75, 0.75);
+			BufferBuilder bufferbuilder = tessellator.getBuffer();
+			bindTexture(TEXTURE);
+			bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+
+			//Actual Block
+			ClientUtils.addTexturedBoxVertices(bufferbuilder, creatorBox, 0.8f, 0.8f, 0.8f, 1.0f);
+			ClientUtils.addTexturedBoxVertices(bufferbuilder, buttonBox.offset(0.8, 0, 0.75), 1.0f, 0.85f, 0.0f, 1.0f);
+			ClientUtils.addTexturedBoxVertices(bufferbuilder, buttonBox.offset(0.8, 0, 0.55), 0.5f, 0.5f, 0.5f, 1.0f);
+			ClientUtils.addTexturedBoxVertices(bufferbuilder, buttonBox.offset(0.8, 0, 0.35), 0.3f, 0.3f, 0.3f, 1.0f);
+			ClientUtils.addTexturedBoxVertices(bufferbuilder, buttonBox.offset(0.8, 0, 0.15), 0.2f, 0.4f, 1.0f, 1.0f);
+
+			tessellator.draw();
+
+			GlStateManager.popMatrix();
+			GlStateManager.enableCull();
+			return;
+		}
+
 		AxisAlignedBB creatorBox = new AxisAlignedBB(0, 0, 0, 1, 0.75, 1).offset(te.getPos());
 		AxisAlignedBB buttonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.85, 0.1).offset(te.getPos());
 		AxisAlignedBB pushedButtonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.8, 0.1).offset(te.getPos());
 		AxisAlignedBB holobox = BlockHologram.HOLO_BOX.offset(te.getPos());
 		Minecraft mc = Minecraft.getMinecraft();
+
 		Vec3d hitVec = mc.player.getPositionEyes(partialTicks);
 		Vec3d lookPos = mc.player.getLook(partialTicks);
 		hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
@@ -56,11 +86,11 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 
 		//Actual Block
-		Utils.addTexturedBoxVertices(bufferbuilder, creatorBox, 0.8f, 0.8f, 0.8f, 1.0f);
-		Utils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 0 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.75), 1.0f, 0.85f, 0.0f, 1.0f);
-		Utils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 1 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.55), 0.5f, 0.5f, 0.5f, 1.0f);
-		Utils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 2 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.35), 0.3f, 0.3f, 0.3f, 1.0f);
-		Utils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 3 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.15), 0.2f, 0.4f, 1.0f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, creatorBox, 0.8f, 0.8f, 0.8f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 0 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.75), 1.0f, 0.85f, 0.0f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 1 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.55), 0.5f, 0.5f, 0.5f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 2 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.35), 0.3f, 0.3f, 0.3f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 3 ? pushedButtonBox : buttonBox).offset(0.8, 0, 0.15), 0.2f, 0.4f, 1.0f, 1.0f);
 
 		//Voxels
 		Random r = new Random(123123213L);
@@ -74,7 +104,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 						(te.voxels[i] == 2) ?
 								new Color(0.5f - shade, 0.5f - shade, 0.5f - shade) :
 								(te.voxels[i] == 3) ? new Color(0.3f - shade, 0.3f - shade, 0.3f - shade) : new Color(0.2f - shade, 0.4f - shade, 1.0f - shade);
-				Utils.addTexturedBoxVertices(bufferbuilder,
+				ClientUtils.addTexturedBoxVertices(bufferbuilder,
 						voxel.offset(te.getPos().getX() + vX * 0.0625 + 0.25, te.getPos().getY() + vY * 0.0625 + 1.5, te.getPos().getZ() + vZ * 0.0625),
 						((float) color.getRed()) / 255f,
 						((float) color.getGreen()) / 255f, ((float) color.getBlue()) / 255f,

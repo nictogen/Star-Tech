@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XXX",
+    "###",
+    "$$$"
+  ],
+  "key": {
+    "X": {
+      "item": "minecraft:glass"
+    },
+    "#": {
+      "item": "minecraft:stone_button"
+    },
+    "$": {
+      "item": "minecraft:iron_block"
+    }
+  },
+  "result": {
+    "item": "star-tech:blueprint_creator"
+  }
+}

@@ -1,7 +1,7 @@
 package com.nic.st.client;
 
 import com.nic.st.items.ItemPrintedGun;
-import com.nic.st.util.Utils;
+import com.nic.st.util.ClientUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -98,7 +98,7 @@ public class PrintedGunModel implements IBakedModel
 											new Color(0.3f - shade, 0.3f - shade, 0.3f - shade) :
 											(ammo-- > 0) ?
 													new Color(0.2f - shade, 0.4f - shade, 1.0f - shade) : new Color(0.3f - shade, 0.3f - shade, 0.5f - shade);
-					Utils.addTexturedBoxVertices(bufferbuilder,
+					ClientUtils.addTexturedBoxVertices(bufferbuilder,
 							voxel.offset(vX * 0.0625, vY * 0.0625, -vZ * 0.0625), ((float) color.getRed()) / 255f,
 							((float) color.getGreen()) / 255f, ((float) color.getBlue()) / 255f,
 							1.0f);

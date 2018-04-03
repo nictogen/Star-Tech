@@ -1,7 +1,7 @@
 package com.nic.st.client;
 
 import com.nic.st.blocks.BlockPrinter;
-import com.nic.st.util.Utils;
+import com.nic.st.util.ClientUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -72,7 +72,7 @@ public class PrinterRenderer extends TileEntitySpecialRenderer<BlockPrinter.Tile
 									(voxels[i] == 3) ?
 											new Color(0.3f - shade, 0.3f - shade, 0.3f - shade) :
 											new Color(0.2f - shade, 0.4f - shade, 1.0f - shade);
-					Utils.addTexturedBoxVertices(bufferbuilder,
+					ClientUtils.addTexturedBoxVertices(bufferbuilder,
 							voxel.offset(vX * 0.0625, vY * 0.0625, vZ * 0.0625), ((float) color.getRed()) / 255f,
 							((float) color.getGreen()) / 255f, ((float) color.getBlue()) / 255f,
 							1.0f);
