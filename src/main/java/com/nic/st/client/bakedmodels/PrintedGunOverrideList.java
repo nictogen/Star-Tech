@@ -14,13 +14,15 @@ import java.util.ArrayList;
  */
 public class PrintedGunOverrideList extends ItemOverrideList
 {
+
 	public PrintedGunOverrideList()
 	{
 		super(new ArrayList<>());
 	}
 
-	@Override public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity)
+	@Override public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stackIn, @Nullable World world, @Nullable EntityLivingBase entity)
 	{
-		return super.handleItemState(originalModel, stack, world, entity);
+		PrintedGunModel.stack = stackIn;
+		return originalModel;
 	}
 }

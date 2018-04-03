@@ -1,6 +1,7 @@
 package com.nic.st.blocks;
 
 import com.nic.st.StarTech;
+import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.util.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 @Mod.EventBusSubscriber
 public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 {
-	public static final AxisAlignedBB HOLO_BOX = new AxisAlignedBB(0, 1, -0.5, 1, 2, 1.5);
+	public static final AxisAlignedBB HOLO_BOX = new AxisAlignedBB(0.25, 1, 0, 0.75, 1.5, 1);
 
 	public BlockBlueprintCreator()
 	{
@@ -67,6 +68,14 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 	@SubscribeEvent
 	public static void onRightClick(PlayerInteractEvent.RightClickBlock event)
 	{
+		if (event.getEntityPlayer().getHeldItem(event.getHand()).getItem() instanceof ItemPrintedGun && event.getWorld()
+				.getTileEntity(event.getPos().down()) instanceof TileEntityBlueprintCreator)
+		{
+			ItemPrintedGun.getGunData(event.getEntityPlayer().getHeldItem(event.getHand()))
+					.setByteArray("voxels", ((TileEntityBlueprintCreator) event.getWorld().getTileEntity(event.getPos().down())).voxels.clone());
+			return;
+		}
+
 		if (event.getHand() == EnumHand.MAIN_HAND && event.getEntity().world.getBlockState(event.getPos()).getBlock() instanceof BlockHologram)
 		{
 			event.setCanceled(true);
@@ -92,14 +101,6 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 		if (w.getTileEntity(pos.down()) instanceof TileEntityBlueprintCreator)
 		{
 			creators.add((TileEntityBlueprintCreator) w.getTileEntity(pos.down()));
-		}
-		if (w.getTileEntity(pos.down().north()) instanceof TileEntityBlueprintCreator)
-		{
-			creators.add((TileEntityBlueprintCreator) w.getTileEntity(pos.down().north()));
-		}
-		if (w.getTileEntity(pos.down().south()) instanceof TileEntityBlueprintCreator)
-		{
-			creators.add((TileEntityBlueprintCreator) w.getTileEntity(pos.down().south()));
 		}
 
 		Vec3d hitVec = player.getPositionEyes(0.0f);
@@ -162,11 +163,11 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 		AxisAlignedBB voxel = new AxisAlignedBB(0, 0, 0, 0.0625, 0.0625, 0.0625);
 		Vec3d closest = null;
 		int closestIndex = -1;
-		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 16, y = (i % 256) / 16, z = i / 256)
+		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
 		{
 			if (voxels[i] != 0)
 			{
-				AxisAlignedBB current = voxel.offset(pos.getX() + x * 0.0625, pos.getY() + 1 + y * 0.0625, pos.getZ() - 0.5 + z * 0.0625);
+				AxisAlignedBB current = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1 + y * 0.0625, pos.getZ() + z * 0.0625);
 				RayTraceResult currentResult = current.calculateIntercept(origin, end);
 				if (currentResult != null)
 				{
@@ -191,9 +192,9 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 
 		RayTraceResult closestVoxel = null;
 
-		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 16, y = (i % 256) / 16, z = i / 256)
+		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
 		{
-			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625, pos.getY() + 1 + y * 0.0625, pos.getZ() - 0.5 + z * 0.0625);
+			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1 + y * 0.0625, pos.getZ() + z * 0.0625);
 			if (voxels[i] != 0)
 			{
 				RayTraceResult cvResult = voxelPos.calculateIntercept(origin, end);
@@ -210,9 +211,9 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 		RayTraceResult farthestEmptyVoxel = null;
 		int farthestEmptyIndex = -1;
 
-		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 16, y = (i % 256) / 16, z = i / 256)
+		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
 		{
-			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625, pos.getY() + 1 + y * 0.0625, pos.getZ() - 0.5 + z * 0.0625);
+			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1 + y * 0.0625, pos.getZ() + z * 0.0625);
 			if (voxels[i] == 0)
 			{
 				RayTraceResult fvResult = voxelPos.calculateIntercept(origin, end);
@@ -275,7 +276,7 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 	public static class TileEntityBlueprintCreator extends TileEntity implements ITickable
 	{
 
-		public byte[] voxels = new byte[8192];
+		public byte[] voxels = new byte[1024];
 
 		public TileEntityBlueprintCreator()
 		{
@@ -284,8 +285,6 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 		@Override public void update()
 		{
 			setHologram(getWorld(), getPos().up());
-			setHologram(getWorld(), getPos().up().north());
-			setHologram(getWorld(), getPos().up().south());
 		}
 
 		void setHologram(World w, BlockPos pos)

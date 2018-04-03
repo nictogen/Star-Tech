@@ -2,6 +2,7 @@ package com.nic.st;
 
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
+import com.nic.st.client.bakedmodels.PrintedGunModel;
 import com.nic.st.client.bakedmodels.PrintedGunModelLoader;
 import com.nic.st.client.tesr.BlueprintCreatorRenderer;
 import com.nic.st.items.ItemPrintedGun;
@@ -9,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -103,6 +105,12 @@ public class StarTech
 		{
 			ClientRegistry.bindTileEntitySpecialRenderer(BlockBlueprintCreator.TileEntityBlueprintCreator.class, new BlueprintCreatorRenderer());
 		}
+	}
+
+	@SubscribeEvent
+	public void bakeModel(ModelBakeEvent event)
+	{
+		event.getModelRegistry().putObject(new ModelResourceLocation(Items.printedGun.getRegistryName(), "inventory"), new PrintedGunModel());
 	}
 
 	@GameRegistry.ObjectHolder(MODID)
