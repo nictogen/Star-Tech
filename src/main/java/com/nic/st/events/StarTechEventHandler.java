@@ -74,7 +74,7 @@ public class StarTechEventHandler
 	}
 
 	@SubscribeEvent
-	public void onRightClick(PlayerInteractEvent.RightClickBlock event)
+	public static void onRightClick(PlayerInteractEvent.RightClickBlock event)
 	{
 		if (!(event.getEntity().world.getBlockState(event.getPos()).getBlock() instanceof BlockHologram))
 			return;
