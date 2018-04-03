@@ -1,4 +1,4 @@
-package com.nic.st.client.tesr;
+package com.nic.st.client;
 
 import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
@@ -32,8 +32,8 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		Vec3d hitVec = mc.player.getPositionEyes(partialTicks);
 		Vec3d lookPos = mc.player.getLook(partialTicks);
 		hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
-		//		int lookVoxel = BlockBlueprintCreator
-		//				.getVoxel(BlockBlueprintCreator.HOLO_BOX.offset(te.getPos()), mc.player.getPositionEyes(partialTicks), hitVec, te.voxels, te.getPos());
+		int lookVoxel = Utils
+				.getVoxel(BlockBlueprintCreator.HOLO_BOX.offset(te.getPos()), mc.player.getPositionEyes(partialTicks), hitVec, te.voxels, te.getPos());
 
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -62,16 +62,20 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 						voxel.offset(te.getPos().getX() + vX * 0.0625 + 0.25, te.getPos().getY() + vY * 0.0625 + 1, te.getPos().getZ() + vZ * 0.0625), 0.3f,
 						0.3f, 0.8f - shade,
 						1.0f);
-				//				if (lookVoxel == i)
-				//				{
-				//					RenderGlobal.drawSelectionBoundingBox(
-				//							voxel.offset(te.getPos().getX() + vX * 0.0625, te.getPos().getY() + vY * 0.0625 + 1, te.getPos().getZ() + vZ * 0.0625 - 0.5)
-				//									.grow(0.001), 1.0f, 1.0f, 1.0f, 1.0f);
-				//				}
-				//				GlStateManager.enableTexture2D();
 			}
 		}
 		tessellator.draw();
+
+		if (lookVoxel != -1)
+		{
+			GlStateManager.disableTexture2D();
+			RenderGlobal.drawSelectionBoundingBox(
+					voxel.offset(te.getPos().getX() + (lookVoxel % 8) * 0.0625 + 0.25, te.getPos().getY() + (lookVoxel % 64 / 8) * 0.0625 + 1,
+							te.getPos().getZ() + (lookVoxel / 64) * 0.0625)
+							.grow(0.001), 1.0f, 1.0f, 1.0f, 1.0f);
+
+			GlStateManager.enableTexture2D();
+		}
 
 		GlStateManager.enableCull();
 		GlStateManager.enableLighting();

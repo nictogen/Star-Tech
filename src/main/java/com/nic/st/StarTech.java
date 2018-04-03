@@ -2,9 +2,8 @@ package com.nic.st;
 
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
-import com.nic.st.client.bakedmodels.PrintedGunModel;
-import com.nic.st.client.bakedmodels.PrintedGunModelLoader;
-import com.nic.st.client.tesr.BlueprintCreatorRenderer;
+import com.nic.st.client.BlueprintCreatorRenderer;
+import com.nic.st.client.PrintedGunModel;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -89,7 +88,7 @@ public class StarTech
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		ModelLoaderRegistry.registerLoader(new PrintedGunModelLoader());
+		ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
 	}
 
 	@EventHandler

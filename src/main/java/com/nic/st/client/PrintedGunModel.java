@@ -1,6 +1,5 @@
-package com.nic.st.client.bakedmodels;
+package com.nic.st.client;
 
-import com.nic.st.client.tesr.BlueprintCreatorRenderer;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.util.Utils;
 import net.minecraft.block.state.IBlockState;
@@ -14,9 +13,15 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
+import net.minecraftforge.client.model.ICustomModelLoader;
+import net.minecraftforge.client.model.IModel;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
@@ -31,8 +36,8 @@ import java.util.Random;
  */
 public class PrintedGunModel implements IBakedModel
 {
-	private static final PrintedGunOverrideList list = new PrintedGunOverrideList();
 	public static ItemStack stack = null;
+	private static final PrintedGunOverrideList list = new PrintedGunOverrideList();
 
 	public PrintedGunModel()
 	{
@@ -47,38 +52,22 @@ public class PrintedGunModel implements IBakedModel
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(0.5F, 0.5F, 0.5F);
 		GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-		//		GlStateManager.rotate(180f, 0f, 1f, 0f);
 		GlStateManager.rotate(180f, 1f, 0f, 0f);
 		GlStateManager.translate(-0.25f, 0f, 0.9f);
-		//		if (owner != null) {
-		//			if (transformType == ItemCameraTransforms.TransformType.THIRD_PERSON) {
-		//				if (owner.isSneaking()) GlStateManager.translate(0.0F, -0.2F, 0.0F);
-		//			}
-		//		}
-
-		//		if (onGround()) {
-		//			GlStateManager.scale(-3f, -3f, -3f);
-		//		}
 
 		render();
 		GlStateManager.popMatrix();
-		// Reset the dynamic values.
-		//		this.owner = null;
 		stack = null;
-		//		this.transformType = null;
-
-		// Method that this gets called is expecting that we are still using
-		// startDrawingQuads.
 		builder.begin(7, DefaultVertexFormats.ITEM);
 		return new ArrayList<>();
 	}
 
 	@Override public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType)
 	{
-		//		this.transformType = cameraTransformType;
 		return net.minecraftforge.client.ForgeHooksClient.handlePerspective(this, cameraTransformType);
 	}
 
+	//TODO figure out culling when it's an EntityItem
 	private void render()
 	{
 		if (stack != null)
@@ -134,4 +123,37 @@ public class PrintedGunModel implements IBakedModel
 	{
 		return list;
 	}
+
+	public static class PrintedGunOverrideList extends ItemOverrideList
+	{
+		public PrintedGunOverrideList()
+		{
+			super(new ArrayList<>());
+		}
+
+		@Override public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stackIn, @Nullable World world, @Nullable EntityLivingBase entity)
+		{
+			stack = stackIn;
+			return originalModel;
+		}
+	}
+
+	public static class PrintedGunModelLoader implements ICustomModelLoader
+	{
+		@Override public boolean accepts(ResourceLocation modelLocation)
+		{
+			return modelLocation.getResourcePath().contains("printed_gun");
+		}
+
+		@Override public IModel loadModel(ResourceLocation modelLocation)
+		{
+			return (state, format, bakedTextureGetter) -> new PrintedGunModel();
+		}
+
+		@Override public void onResourceManagerReload(IResourceManager resourceManager)
+		{
+		}
+	}
+
+
 }

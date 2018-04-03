@@ -1,5 +1,6 @@
 package com.nic.st.blocks;
 
+import com.nic.st.util.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,7 +25,7 @@ public class BlockHologram extends Block
 	@Override public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
 	{
 		if (world.isRemote)
-			BlockBlueprintCreator.breakVoxels(world, pos, player);
+			Utils.breakVoxels(world, pos, player);
 		return false;
 	}
 
