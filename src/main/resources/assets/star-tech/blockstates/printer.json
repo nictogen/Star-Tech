@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "normal": {
+      "model": "star-tech:printer.obj"
+    }
+  }
+}

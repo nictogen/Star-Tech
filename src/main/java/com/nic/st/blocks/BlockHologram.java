@@ -45,6 +45,13 @@ public class BlockHologram extends Block
 		}
 	}
 
+	@Override
+	public boolean isOpaqueCube(IBlockState state)
+	{
+		return false;
+	}
+
+
 	@Override public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
 	{
 		return HOLO_BOX.offset(0, -1, 0);

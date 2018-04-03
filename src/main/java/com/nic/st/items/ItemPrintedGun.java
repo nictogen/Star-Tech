@@ -4,6 +4,8 @@ import com.nic.st.StarTech;
 import com.nic.st.entity.EntityBullet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,6 +26,7 @@ public class ItemPrintedGun extends Item
 	{
 		setRegistryName(StarTech.MODID, "printed_gun");
 		setUnlocalizedName("printed_gun");
+		setMaxStackSize(1);
 	}
 
 	public static NBTTagCompound getGunData(ItemStack stack)
@@ -117,7 +120,7 @@ public class ItemPrintedGun extends Item
 
 		NBTTagCompound gunData = getGunData(itemstack);
 
-		if (gunData.getInteger("ammo") <= 0)
+		if (gunData.getInteger("ammo") <= 0 && !reload(player, itemstack))
 			return new ActionResult<>(EnumActionResult.FAIL, itemstack);
 		if (gunData.getInteger("fireCount") < gunData.getInteger("fire_freq"))
 			return new ActionResult<>(EnumActionResult.FAIL, itemstack);
@@ -141,6 +144,62 @@ public class ItemPrintedGun extends Item
 			worldIn.spawnEntity(entityBullet);
 		}
 		return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
+	}
+
+	private boolean reload(EntityPlayer player, ItemStack stack)
+	{
+		NBTTagCompound gunData = getGunData(stack);
+
+		for (ItemStack itemStack : player.inventory.mainInventory)
+		{
+			if (itemStack.getItem() == Items.REDSTONE)
+			{
+				if (gunData.getInteger("ammo") < gunData.getInteger("max_ammo"))
+				{
+					gunData.setInteger("ammo", Math.min(gunData.getInteger("ammo" + 20), gunData.getInteger("max_ammo")));
+				}
+				else
+					return true;
+			}
+			if (itemStack.getItem() == Item.getItemFromBlock(Blocks.REDSTONE_BLOCK))
+			{
+				if (gunData.getInteger("ammo") < gunData.getInteger("max_ammo"))
+				{
+					gunData.setInteger("ammo", Math.min(gunData.getInteger("ammo" + 180), gunData.getInteger("max_ammo")));
+				}
+				else
+					return true;
+			}
+			if (itemStack.getItem() == Items.GUNPOWDER)
+			{
+				if (gunData.getInteger("ammo") < gunData.getInteger("max_ammo"))
+				{
+					gunData.setInteger("ammo", Math.min(gunData.getInteger("ammo" + 40), gunData.getInteger("max_ammo")));
+				}
+				else
+					return true;
+			}
+			if (itemStack.getItem() == Items.GLOWSTONE_DUST)
+			{
+				if (gunData.getInteger("ammo") < gunData.getInteger("max_ammo"))
+				{
+					gunData.setInteger("ammo", Math.min(gunData.getInteger("ammo" + 40), gunData.getInteger("max_ammo")));
+				}
+				else
+					return true;
+			}
+			if (itemStack.getItem() == Item.getItemFromBlock(Blocks.GLOWSTONE))
+			{
+				if (gunData.getInteger("ammo") < gunData.getInteger("max_ammo"))
+				{
+					gunData.setInteger("ammo", Math.min(gunData.getInteger("ammo" + 160), gunData.getInteger("max_ammo")));
+				}
+				else
+					return true;
+			}
+		}
+
+		return gunData.getInteger("ammo") > 0;
 	}
 
 	private Vec3d getVectorForRotation(float pitch, float yaw)

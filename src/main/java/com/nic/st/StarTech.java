@@ -2,10 +2,13 @@ package com.nic.st;
 
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
+import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.client.BlueprintCreatorRenderer;
 import com.nic.st.client.BulletRenderer;
 import com.nic.st.client.PrintedGunModel;
+import com.nic.st.client.PrinterRenderer;
 import com.nic.st.entity.EntityBullet;
+import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -16,6 +19,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -30,7 +34,12 @@ import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Mod(modid = StarTech.MODID, name = StarTech.NAME, version = StarTech.VERSION)
 @Mod.EventBusSubscriber
@@ -45,6 +54,7 @@ public class StarTech
 	{
 		event.getRegistry().register(new BlockBlueprintCreator());
 		event.getRegistry().register(new BlockHologram());
+		event.getRegistry().register(new BlockPrinter());
 	}
 
 	@SubscribeEvent
@@ -59,6 +69,7 @@ public class StarTech
 	public static void registerItems(RegistryEvent.Register<Item> event) throws IllegalAccessException
 	{
 		event.getRegistry().register(new ItemPrintedGun());
+		event.getRegistry().register(new ItemBlueprint());
 
 		for (Field field : Blocks.class.getDeclaredFields())
 		{
@@ -90,7 +101,7 @@ public class StarTech
 			{
 				Block block = (Block) f.get(null);
 				Item item = Item.getItemFromBlock(block);
-				ModelResourceLocation loc = new ModelResourceLocation(item.getRegistryName(), "inventory");
+				ModelResourceLocation loc = new ModelResourceLocation(item.getRegistryName() + (f.isAnnotationPresent(OBJ.class) ? ".obj" : ""), "inventory");
 				ModelLoader.setCustomModelResourceLocation(item, 0, loc);
 			}
 			catch (IllegalAccessException | ClassCastException e)
@@ -107,6 +118,7 @@ public class StarTech
 		{
 			ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
 			RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, BulletRenderer::new);
+			OBJLoader.INSTANCE.addDomain(MODID);
 		}
 	}
 
@@ -114,6 +126,7 @@ public class StarTech
 	public void init(FMLInitializationEvent event)
 	{
 		GameRegistry.registerTileEntity(BlockBlueprintCreator.TileEntityBlueprintCreator.class, "star-tech:blueprint_creator");
+		GameRegistry.registerTileEntity(BlockPrinter.TileEntityPrinter.class, "star-tech:printer");
 	}
 
 	@EventHandler
@@ -122,7 +135,14 @@ public class StarTech
 		if (event.getSide().isClient())
 		{
 			ClientRegistry.bindTileEntitySpecialRenderer(BlockBlueprintCreator.TileEntityBlueprintCreator.class, new BlueprintCreatorRenderer());
+			ClientRegistry.bindTileEntitySpecialRenderer(BlockPrinter.TileEntityPrinter.class, new PrinterRenderer());
 		}
+	}
+
+	@Retention(value = RUNTIME)
+	@Target(value = FIELD)
+	private @interface OBJ
+	{
 	}
 
 	@SubscribeEvent
@@ -138,6 +158,9 @@ public class StarTech
 		public static final Block blueprintCreator = null;
 
 		public static final Block hologram = null;
+
+		@OBJ
+		public static final Block printer = null;
 	}
 
 	@GameRegistry.ObjectHolder(MODID)
@@ -148,6 +171,8 @@ public class StarTech
 
 		@GameRegistry.ObjectHolder("blueprint_creator")
 		public static final Item blueprintCreator = null;
+
+		public static final Item blueprint = null;
 	}
 
 }

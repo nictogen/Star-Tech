@@ -2,7 +2,6 @@ package com.nic.st.blocks;
 
 import com.nic.st.StarTech;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,7 +20,7 @@ import static com.nic.st.blocks.BlockHologram.HOLO_BOX;
 /**
  * Created by Nictogen on 4/1/18.
  */
-public class BlockBlueprintCreator extends Block implements ITileEntityProvider
+public class BlockBlueprintCreator extends Block
 {
 
 	public BlockBlueprintCreator()
@@ -38,11 +37,10 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 		return EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
 	}
 
-	@Override public boolean hasTileEntity()
+	public boolean hasTileEntity(IBlockState state)
 	{
 		return true;
 	}
-
 	@Override
 	public boolean isOpaqueCube(IBlockState state)
 	{
@@ -53,11 +51,6 @@ public class BlockBlueprintCreator extends Block implements ITileEntityProvider
 	public TileEntity createTileEntity(World world, IBlockState state)
 	{
 		return new TileEntityBlueprintCreator();
-	}
-
-	@Nullable @Override public TileEntity createNewTileEntity(World worldIn, int meta)
-	{
-		return createTileEntity(worldIn, getDefaultState());
 	}
 
 	public static class TileEntityBlueprintCreator extends TileEntity implements ITickable

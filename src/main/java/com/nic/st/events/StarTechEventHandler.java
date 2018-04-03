@@ -1,5 +1,6 @@
 package com.nic.st.events;
 
+import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.items.ItemPrintedGun;
@@ -7,6 +8,8 @@ import com.nic.st.util.LimbManipulationUtil;
 import com.nic.st.util.Utils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -81,16 +84,29 @@ public class StarTechEventHandler
 	@SubscribeEvent
 	public static void onRightClick(PlayerInteractEvent.RightClickBlock event)
 	{
-		if (event.getEntityPlayer().getHeldItem(event.getHand()).getItem() instanceof ItemPrintedGun && event.getWorld()
+		if (!(event.getEntity().world.getBlockState(event.getPos()).getBlock() instanceof BlockHologram))
+			return;
+
+		if (event.getHand() == EnumHand.MAIN_HAND && event.getEntityPlayer().isSneaking() && event.getWorld()
 				.getTileEntity(event.getPos().down()) instanceof BlockBlueprintCreator.TileEntityBlueprintCreator)
 		{
-			ItemPrintedGun
-					.createGunData(((BlockBlueprintCreator.TileEntityBlueprintCreator) event.getWorld().getTileEntity(event.getPos().down())).voxels.clone(),
-							event.getEntityPlayer().getHeldItem(event.getHand()));
+			ItemStack stack = new ItemStack(StarTech.Items.blueprint);
+			NBTTagCompound compound = new NBTTagCompound();
+			compound.setByteArray("voxels",
+					((BlockBlueprintCreator.TileEntityBlueprintCreator) event.getWorld().getTileEntity(event.getPos().down())).voxels.clone());
+			int total = 0;
+			for (byte voxels : compound.getByteArray("voxels"))
+			{
+				if (voxels != 0)
+					total++;
+			}
+			compound.setInteger("total", total);
+			stack.setTagCompound(compound);
+
+			event.getEntityPlayer().addItemStackToInventory(stack);
 			return;
 		}
-
-		if (event.getHand() == EnumHand.MAIN_HAND && event.getEntity().world.getBlockState(event.getPos()).getBlock() instanceof BlockHologram)
+		else if (event.getHand() == EnumHand.MAIN_HAND)
 		{
 			event.setCanceled(true);
 			if (!event.getWorld().isRemote)
