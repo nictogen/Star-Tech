@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -82,6 +83,7 @@ public class StarTech
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		proxy.preInit(event);
+		MinecraftForge.EVENT_BUS.register(proxy);
 	}
 
 	@EventHandler

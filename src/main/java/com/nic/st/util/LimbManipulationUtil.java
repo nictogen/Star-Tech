@@ -1,6 +1,5 @@
 package com.nic.st.util;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
@@ -9,17 +8,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod.EventBusSubscriber(Side.CLIENT)
 public class LimbManipulationUtil
 {
 
@@ -130,57 +124,6 @@ public class LimbManipulationUtil
 		return manipulator;
 	}
 
-	@SubscribeEvent
-	public static void onRenderPlayerPost(RenderPlayerEvent.Post event)
-	{
-		@SuppressWarnings("rawtypes") RenderLivingBase renderer = (RenderLivingBase) Minecraft
-				.getMinecraft().getRenderManager().getEntityRenderObject(event.getEntityPlayer());
-		List<LayerRenderer<AbstractClientPlayer>> layerList = ReflectionHelper
-				.getPrivateValue(RenderLivingBase.class, renderer, 4);
-		try
-		{
-			for (LayerRenderer<AbstractClientPlayer> layer : layerList)
-			{
-				for (Field field : layer.getClass().getDeclaredFields())
-				{
-					field.setAccessible(true);
-					if (field.getType() == ModelBiped.class)
-					{
-						for (ModelRenderer modelRenderer : ((ModelBiped) field
-								.get(layer)).boxList)
-						{
-							if (modelRenderer instanceof CustomModelRenderer)
-							{
-								((CustomModelRenderer) modelRenderer).reset();
-							}
-						}
-					}
-					else if (field.getType() == ModelPlayer.class)
-					{
-						for (ModelRenderer modelRenderer : ((ModelBiped) field
-								.get(layer)).boxList)
-						{
-							if (modelRenderer instanceof CustomModelRenderer)
-							{
-								((CustomModelRenderer) modelRenderer).reset();
-							}
-						}
-					}
-				}
-			}
-			for (ModelRenderer modelRenderer : event.getRenderer().getMainModel().boxList)
-			{
-				if (modelRenderer instanceof CustomModelRenderer)
-				{
-					((CustomModelRenderer) modelRenderer).reset();
-				}
-			}
-		}
-		catch (IllegalAccessException ignored)
-		{
-		}
-	}
-
 	public static float interpolateRotation(float prev, float current, float partialTicks)
 	{
 		float f;
@@ -243,7 +186,7 @@ public class LimbManipulationUtil
 		}
 	}
 
-	private static class CustomModelRenderer extends ModelRenderer
+	public static class CustomModelRenderer extends ModelRenderer
 	{
 
 		private float actualX, actualY, actualZ;
@@ -291,7 +234,7 @@ public class LimbManipulationUtil
 			GlStateManager.popMatrix();
 		}
 
-		private void reset()
+		public void reset()
 		{
 			if (f != null)
 			{

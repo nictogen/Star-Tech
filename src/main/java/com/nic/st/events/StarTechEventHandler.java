@@ -3,25 +3,17 @@ package com.nic.st.events;
 import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
-import com.nic.st.items.ItemPrintedGun;
-import com.nic.st.util.LimbManipulationUtil;
 import com.nic.st.util.Utils;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.util.ArrayList;
 
 /**
  * Created by Nictogen on 4/2/18.
@@ -82,7 +74,7 @@ public class StarTechEventHandler
 	}
 
 	@SubscribeEvent
-	public static void onRightClick(PlayerInteractEvent.RightClickBlock event)
+	public void onRightClick(PlayerInteractEvent.RightClickBlock event)
 	{
 		if (!(event.getEntity().world.getBlockState(event.getPos()).getBlock() instanceof BlockHologram))
 			return;
@@ -114,43 +106,5 @@ public class StarTechEventHandler
 		}
 	}
 
-	@SubscribeEvent
-	public static void onDrawBlockHighlightEvent(DrawBlockHighlightEvent event)
-	{
-		if (event.getTarget().getBlockPos() != null && event.getPlayer().world
-				.getBlockState(event.getTarget().getBlockPos()).getBlock() instanceof BlockHologram)
-		{
-			event.setCanceled(true);
-		}
-	}
 
-	@SubscribeEvent
-	public static void onRenderPlayerPre(RenderPlayerEvent.Pre event)
-	{
-		EntityPlayer player = event.getEntityPlayer();
-
-		ArrayList<LimbManipulationUtil.Limb> limbs = new ArrayList<>();
-
-		float f = LimbManipulationUtil.interpolateRotation(player.prevRenderYawOffset, player.renderYawOffset, event.getPartialRenderTick());
-		float f1 = LimbManipulationUtil.interpolateRotation(player.prevRotationYawHead, player.rotationYawHead, event.getPartialRenderTick());
-		float f2 = f1 - f;
-
-		if (player.getHeldItemMainhand().getItem() instanceof ItemPrintedGun)
-		{
-			limbs.add(
-					event.getEntityPlayer().getPrimaryHand() == EnumHandSide.RIGHT ? LimbManipulationUtil.Limb.RIGHT_ARM : LimbManipulationUtil.Limb.LEFT_ARM);
-		}
-		if (player.getHeldItemOffhand().getItem() instanceof ItemPrintedGun)
-		{
-			limbs.add(
-					event.getEntityPlayer().getPrimaryHand() != EnumHandSide.RIGHT ? LimbManipulationUtil.Limb.RIGHT_ARM : LimbManipulationUtil.Limb.LEFT_ARM);
-
-		}
-
-		for (LimbManipulationUtil.Limb limb : limbs)
-		{
-			LimbManipulationUtil.getLimbManipulator(event.getRenderer(), limb).setAngles(event.getEntityPlayer().rotationPitch - 90, f2, 0);
-		}
-
-	}
 }
