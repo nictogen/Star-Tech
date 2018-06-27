@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -46,7 +47,7 @@ import java.util.List;
 public class ClientProxy extends CommonProxy
 {
 	@SubscribeEvent
-	public static void onRenderPlayerPost(RenderPlayerEvent.Post event)
+	public void onRenderPlayerPost(RenderPlayerEvent.Post event)
 	{
 		@SuppressWarnings("rawtypes") RenderLivingBase renderer = (RenderLivingBase) Minecraft
 				.getMinecraft().getRenderManager().getEntityRenderObject(event.getEntityPlayer());
@@ -177,8 +178,8 @@ public class ClientProxy extends CommonProxy
 	@SubscribeEvent
 	public void onDrawBlockHighlightEvent(DrawBlockHighlightEvent event)
 	{
-		if (event.getTarget().getBlockPos() != null && event.getPlayer().world
-				.getBlockState(event.getTarget().getBlockPos()).getBlock() instanceof BlockHologram)
+		if (event.getTarget().typeOfHit == RayTraceResult.Type.BLOCK && event.getPlayer().world.getBlockState(event.getTarget().getBlockPos())
+				.getBlock() instanceof BlockHologram)
 		{
 			event.setCanceled(true);
 		}
