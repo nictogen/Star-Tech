@@ -130,7 +130,7 @@ public class BlockPrinter extends Block
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
 			}
 			else if (ticks > 0 && getWorld().isBlockPowered(getPos()) && blueprint.getItem() instanceof ItemBlueprint)
-				ticks++;
+				ticks += 200;
 			else if (ticks != 0 && (!getWorld().isBlockPowered(getPos()) || blueprint.isEmpty()))
 			{
 				gun = ItemStack.EMPTY;

@@ -124,7 +124,6 @@ public class ItemPrintedGun extends Item
 		if (gunData.getInteger("fireCount") < gunData.getInteger("fire_freq"))
 			return new ActionResult<>(EnumActionResult.FAIL, itemstack);
 
-		//		worldIn.playSound(null, playerIn.posX, playerIn.posY, playerIn.posZ, SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 		gunData.setInteger("fireCount", 0);
 		gunData.setInteger("ammo", gunData.getInteger("ammo") - (int) (gunData.getDouble("damage") * 20.0));
 		if (!worldIn.isRemote)
