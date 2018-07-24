@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
  */
 public class BlockHologram extends Block
 {
-	public static final AxisAlignedBB HOLO_BOX = new AxisAlignedBB(0.25, 1.5, 0, 0.75, 2, 1);
+	public static final AxisAlignedBB HOLO_BOX = new AxisAlignedBB(0, 1.5, 0.25, 1, 2, 0.75);
 
 	public BlockHologram()
 	{

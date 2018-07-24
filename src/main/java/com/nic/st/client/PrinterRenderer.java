@@ -60,7 +60,8 @@ public class PrinterRenderer extends TileEntitySpecialRenderer<BlockPrinter.Tile
 
 			byte[] voxels = te.gun.getTagCompound().getByteArray("voxels");
 			int amountToRender = te.ticks / 200;
-			for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vX = i % 8, vY = (i % 64) / 8, vZ = i / 64)
+
+			for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vX = i / 64, vY = (i % 64) / 8, vZ = i % 8)
 			{
 				float shade = ((float) r.nextInt(32)) * 0.001953125f;
 				if (voxels[i] != 0 && (amountToRender-- > 0 || te.ticks == 0))

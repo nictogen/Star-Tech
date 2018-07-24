@@ -23,7 +23,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -108,8 +107,6 @@ public class ClientProxy extends CommonProxy
 	{
 		ClientRegistry.bindTileEntitySpecialRenderer(BlockBlueprintCreator.TileEntityBlueprintCreator.class, new BlueprintCreatorRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(BlockPrinter.TileEntityPrinter.class, new PrinterRenderer());
-		ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(StarTech.Blocks.blueprintCreator), 0,
-				BlockBlueprintCreator.TileEntityBlueprintCreator.class);
 	}
 
 	@SubscribeEvent public void registerModels(ModelRegistryEvent ev)

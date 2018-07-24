@@ -1,18 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "star-tech:blueprint_creator"
-  },
   "variants": {
-    "inventory": [
-      {
-        "model": "star-tech:blueprint_creator"
-      }
-    ],
-    "normal": [
-      {
-        "model": "star-tech:blueprint_creator"
-      }
-    ]
+    "normal": {
+      "model": "star-tech:blueprint_creator.obj"
+    }
   }
 }

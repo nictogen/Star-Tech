@@ -9,7 +9,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -32,18 +31,17 @@ public class BlockBlueprintCreator extends Block
 		setHardness(2.0f).setResistance(10.0f);
 		setCreativeTab(CreativeTabs.REDSTONE);
 	}
-
-	@Deprecated
-	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state)
-	{
-		return EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
-	}
-
 	public boolean hasTileEntity(IBlockState state)
 	{
 		return true;
 	}
+
+	@Deprecated
+	public boolean isFullCube(IBlockState state)
+	{
+		return false;
+	}
+
 	@Override
 	public boolean isOpaqueCube(IBlockState state)
 	{

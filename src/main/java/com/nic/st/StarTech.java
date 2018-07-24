@@ -110,6 +110,7 @@ public class StarTech
 	public static class Blocks
 	{
 		@GameRegistry.ObjectHolder("blueprint_creator")
+		@OBJ
 		public static final Block blueprintCreator = null;
 
 		public static final Block hologram = null;

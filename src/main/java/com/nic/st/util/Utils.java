@@ -90,11 +90,11 @@ public class Utils
 		AxisAlignedBB voxel = new AxisAlignedBB(0, 0, 0, 0.0625, 0.0625, 0.0625);
 		Vec3d closest = null;
 		int closestIndex = -1;
-		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
+		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i / 64, y = (i % 64) / 8, z = i % 8)
 		{
 			if (voxels[i] != 0)
 			{
-				AxisAlignedBB current = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625);
+				AxisAlignedBB current = voxel.offset(pos.getX() + x * 0.0625, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625 + 0.25);
 				RayTraceResult currentResult = current.calculateIntercept(origin, end);
 				if (currentResult != null)
 				{
@@ -192,9 +192,9 @@ public class Utils
 
 		RayTraceResult closestVoxel = null;
 
-		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
+		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i / 64, y = (i % 64) / 8, z = i % 8)
 		{
-			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625);
+			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625 + 0.25);
 			if (voxels[i] != 0)
 			{
 				RayTraceResult cvResult = voxelPos.calculateIntercept(origin, end);
@@ -211,9 +211,9 @@ public class Utils
 		RayTraceResult farthestEmptyVoxel = null;
 		int farthestEmptyIndex = -1;
 
-		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i % 8, y = (i % 64) / 8, z = i / 64)
+		for (int i = 0, x = 0, y = 0, z = 0; i < voxels.length; i++, x = i / 64, y = (i % 64) / 8, z = i % 8)
 		{
-			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625 + 0.25, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625);
+			AxisAlignedBB voxelPos = voxel.offset(pos.getX() + x * 0.0625, pos.getY() + 1.5 + y * 0.0625, pos.getZ() + z * 0.0625 + 0.25);
 			if (voxels[i] == 0)
 			{
 				RayTraceResult fvResult = voxelPos.calculateIntercept(origin, end);
