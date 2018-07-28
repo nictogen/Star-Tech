@@ -33,8 +33,8 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		Tessellator tessellator = Tessellator.getInstance();
 
 		AxisAlignedBB creatorBox = new AxisAlignedBB(0.1, 0, 0.1, 0.9, 1, 0.9).offset(te.getPos());
-		AxisAlignedBB buttonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.85, 0.1).offset(te.getPos());
-		AxisAlignedBB pushedButtonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.8, 0.1).offset(te.getPos());
+		AxisAlignedBB buttonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.85, 0.1);
+		AxisAlignedBB pushedButtonBox = new AxisAlignedBB(0.0, 0.75, 0.025, 0.1, 0.85, 0.1);
 		AxisAlignedBB holobox = BlockHologram.HOLO_BOX.offset(te.getPos());
 		Minecraft mc = Minecraft.getMinecraft();
 
@@ -55,6 +55,19 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		GlStateManager.disableCull();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		bindTexture(TEXTURE);
+
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(te.getPos().getX() + 0.75, te.getPos().getY() + 0.2, te.getPos().getZ() - 0.3);
+		GlStateManager.rotate(20f, 1, 0, 0);
+		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 0 ? pushedButtonBox : buttonBox).offset(-0.3, 0, 0), 1.0f, 0.85f, 0.0f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 1 ? pushedButtonBox : buttonBox).offset(-0.2, 0, 0), 0.5f, 0.5f, 0.5f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 2 ? pushedButtonBox : buttonBox).offset(-0.1, 0, 0), 0.3f, 0.3f, 0.3f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 3 ? pushedButtonBox : buttonBox), 0.2f, 0.4f, 1.0f, 1.0f);
+		tessellator.draw();
+		GlStateManager.popMatrix();
+
+
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 
 		//Voxels

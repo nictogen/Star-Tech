@@ -1,7 +1,13 @@
 {
+  "forge_marker": 1,
   "variants": {
-    "normal": {
-      "model": "star-tech:printer.obj"
+    "empty": {
+      "true": {
+        "model": "star-tech:printer_empty.obj"
+      },
+      "false": {
+        "model": "star-tech:printer.obj"
+      }
     }
   }
 }

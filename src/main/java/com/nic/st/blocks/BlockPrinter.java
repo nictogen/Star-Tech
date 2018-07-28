@@ -5,6 +5,8 @@ import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,6 +20,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -28,6 +31,8 @@ import java.util.Random;
  */
 public class BlockPrinter extends Block
 {
+	public static final PropertyBool empty = PropertyBool.create("empty");
+
 	public BlockPrinter()
 	{
 		super(Material.IRON);
@@ -35,6 +40,31 @@ public class BlockPrinter extends Block
 		setUnlocalizedName("printer");
 		setHardness(2.0f).setResistance(10.0f);
 		setCreativeTab(CreativeTabs.REDSTONE);
+	}
+
+	@Override public IBlockState getStateFromMeta(int meta)
+	{
+		return this.blockState.getBaseState();
+	}
+
+	@Override public int getMetaFromState(IBlockState state)
+	{
+		return 0;
+	}
+
+	@Override public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
+	{
+		TileEntity te = worldIn.getTileEntity(pos);
+		if (te instanceof TileEntityPrinter)
+		{
+			return state.withProperty(empty, ((TileEntityPrinter) te).blueprint.isEmpty());
+		}
+		return state.withProperty(empty, false);
+	}
+
+	@Override protected BlockStateContainer createBlockState()
+	{
+		return new BlockStateContainer(this, empty);
 	}
 
 	@Deprecated
@@ -130,7 +160,7 @@ public class BlockPrinter extends Block
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
 			}
 			else if (ticks > 0 && getWorld().isBlockPowered(getPos()) && blueprint.getItem() instanceof ItemBlueprint)
-				ticks += 200;
+				ticks += 5;
 			else if (ticks != 0 && (!getWorld().isBlockPowered(getPos()) || blueprint.isEmpty()))
 			{
 				gun = ItemStack.EMPTY;

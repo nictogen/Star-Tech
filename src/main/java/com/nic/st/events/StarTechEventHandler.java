@@ -39,19 +39,19 @@ public class StarTechEventHandler
 			Vec3d lookPos = event.getEntityPlayer().getLook(0.0f);
 			hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
-			if (buttonBox.offset(0.8, 0, 0.75).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			if (buttonBox.offset(0.45, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
 				te.buttonDown = 0;
 			}
-			else if (buttonBox.offset(0.8, 0, 0.55).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			else if (buttonBox.offset(0.55, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
 				te.buttonDown = 1;
 			}
-			else if (buttonBox.offset(0.8, 0, 0.35).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			else if (buttonBox.offset(0.65, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
 				te.buttonDown = 2;
 			}
-			else if (buttonBox.offset(0.8, 0, 0.15).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			else if (buttonBox.offset(0.75, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
 				te.buttonDown = 3;
 			}

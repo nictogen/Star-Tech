@@ -86,7 +86,7 @@ public class PrintedGunModel implements IBakedModel
 
 			int ammo = (int) Math.round(((double) ItemPrintedGun.getGunData(stack).getInteger("ammo")) / 250.0);
 
-			for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vX = i / 64, vY = (i % 64) / 8, vZ = i % 8)
+			for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vX = i % 8, vY = (i % 64) / 8, vZ = i / 64)
 			{
 				float shade = ((float) r.nextInt(32)) * 0.001953125f;
 				if (voxels[i] != 0)
@@ -100,7 +100,7 @@ public class PrintedGunModel implements IBakedModel
 											(ammo-- > 0) ?
 													new Color(0.2f - shade, 0.4f - shade, 1.0f - shade) : new Color(0.3f - shade, 0.3f - shade, 0.5f - shade);
 					ClientUtils.addTexturedBoxVertices(bufferbuilder,
-							voxel.offset(-vX * 0.0625, vY * 0.0625, vZ * 0.0625), ((float) color.getRed()) / 255f,
+							voxel.offset(vX * 0.0625, vY * 0.0625, -vZ * 0.0625), ((float) color.getRed()) / 255f,
 							((float) color.getGreen()) / 255f, ((float) color.getBlue()) / 255f,
 							1.0f);
 				}
