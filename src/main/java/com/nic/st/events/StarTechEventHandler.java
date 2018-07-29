@@ -3,13 +3,18 @@ package com.nic.st.events;
 import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
+import com.nic.st.entity.EntityPowerRocket;
 import com.nic.st.util.Utils;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -96,7 +101,6 @@ public class StarTechEventHandler
 			stack.setTagCompound(compound);
 
 			event.getEntityPlayer().addItemStackToInventory(stack);
-			return;
 		}
 		else if (event.getHand() == EnumHand.MAIN_HAND)
 		{
@@ -104,6 +108,35 @@ public class StarTechEventHandler
 			if (!event.getWorld().isRemote)
 				Utils.placeVoxels(event.getWorld(), event.getPos(), event.getEntityPlayer());
 		}
+	}
+
+	@SubscribeEvent
+	public static void onUpdate(LivingEvent.LivingUpdateEvent event)
+	{
+		if (!event.getEntity().world.isRemote && event.getEntity() instanceof EntityPlayer && event.getEntity().ticksExisted % 20 == 0)
+		{
+			EntityPowerRocket rocket = new EntityPowerRocket(event.getEntity().world, event.getEntityLiving());
+			EnumHand handIn = EnumHand.MAIN_HAND;
+			EnumHandSide side = (((EntityPlayer) event.getEntity()).getPrimaryHand() == EnumHandSide.RIGHT) ?
+					(handIn == EnumHand.MAIN_HAND) ? EnumHandSide.RIGHT : EnumHandSide.LEFT :
+					(handIn == EnumHand.MAIN_HAND) ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
+			Vec3d eyes = event.getEntity().getPositionEyes(0.0f);
+			Vec3d rotVec = getVectorForRotation(event.getEntity().rotationPitch,
+					(side == EnumHandSide.RIGHT) ? event.getEntity().rotationYaw + 90 : event.getEntity().rotationYaw - 90);
+			Vec3d offset = eyes.add(rotVec.scale(0.3)).subtract(0, 0.1, 0);
+			rocket.setLocationAndAngles(offset.x, offset.y, offset.z, rocket.rotationYaw, rocket.rotationPitch);
+			rocket.shoot(event.getEntity(), -45f - event.getEntity().world.rand.nextInt(45), event.getEntity().world.rand.nextInt(360), 0.0f, 0.25f, 0.5f);
+			event.getEntity().world.spawnEntity(rocket);
+		}
+	}
+
+	private static Vec3d getVectorForRotation(float pitch, float yaw)
+	{
+		float f = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
+		float f1 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
+		float f2 = -MathHelper.cos(-pitch * 0.017453292F);
+		float f3 = MathHelper.sin(-pitch * 0.017453292F);
+		return new Vec3d((double) (f1 * f2), (double) f3, (double) (f * f2));
 	}
 
 

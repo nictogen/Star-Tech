@@ -3,11 +3,9 @@ package com.nic.st;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
-import com.nic.st.client.BlueprintCreatorRenderer;
-import com.nic.st.client.BulletRenderer;
-import com.nic.st.client.PrintedGunModel;
-import com.nic.st.client.PrinterRenderer;
+import com.nic.st.client.*;
 import com.nic.st.entity.EntityBullet;
+import com.nic.st.entity.EntityPowerRocket;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.util.LimbManipulationUtil;
 import net.minecraft.block.Block;
@@ -100,6 +98,7 @@ public class ClientProxy extends CommonProxy
 	{
 		ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
 		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, BulletRenderer::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityPowerRocket.class, PowerRocketRenderer::new);
 		OBJLoader.INSTANCE.addDomain(StarTech.MODID);
 	}
 

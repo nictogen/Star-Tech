@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by Nictogen on 4/1/18.
@@ -232,5 +233,40 @@ public class Utils
 		}
 
 		return farthestEmptyIndex;
+	}
+
+	/**
+	 * Returns a random integer between -1 and 1
+	 */
+	public static int randomInt3(Random random)
+	{
+		int r = random.nextInt(3);
+		if (r == 2)
+			r = -1;
+		return r;
+	}
+
+	public static int p(World w)
+	{
+		int p = w.rand.nextInt(1);
+		if (p == 0)
+			p = -1;
+		return p;
+	}
+
+	public static int i(World w, int range)
+	{
+		int i = 0;
+		while (i == 0)
+			i = w.rand.nextInt(range);
+		return i;
+	}
+
+	public static double d(World w, int divisor)
+	{
+		double d = 0.0;
+		while (d == 0)
+			d = w.rand.nextGaussian() / divisor;
+		return d;
 	}
 }

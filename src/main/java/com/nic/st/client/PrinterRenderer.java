@@ -2,7 +2,6 @@ package com.nic.st.client;
 
 import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.util.ClientUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -38,7 +37,7 @@ public class PrinterRenderer extends TileEntitySpecialRenderer<BlockPrinter.Tile
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferbuilder = tessellator.getBuffer();
 			bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-			Minecraft.getMinecraft().renderEngine.bindTexture(BlueprintCreatorRenderer.TEXTURE);
+			ClientUtils.bindVoxelTexture();
 
 			AxisAlignedBB voxel = new AxisAlignedBB(0, 0, 0, 0.0625, 0.0625, 0.0625);
 			Random r = new Random(123123213L);

@@ -4,6 +4,7 @@ import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.entity.EntityBullet;
+import com.nic.st.entity.EntityPowerRocket;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
@@ -55,6 +56,10 @@ public class StarTech
 	{
 		event.getRegistry().register(
 				EntityEntryBuilder.create().entity(EntityBullet.class).id(new ResourceLocation(MODID, "bullet"), 0).name("bullet").tracker(80, 10, true)
+						.build());
+		event.getRegistry().register(
+				EntityEntryBuilder.create().entity(EntityPowerRocket.class).id(new ResourceLocation(MODID, "power_rocket"), 1).name("power_rocket")
+						.tracker(80, 10, true)
 						.build());
 	}
 

@@ -2,14 +2,17 @@ package com.nic.st.power;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.nic.st.StarTech;
+import com.nic.st.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -72,19 +75,8 @@ public class PowerClientRenderer
 			int y1 = r.nextInt(bufferedimage.getHeight());
 			for (int n = 0; n < 4; n++)
 			{
-				int xOff = r.nextInt(3);
-				int yOff = r.nextInt(3);
-				if (xOff == 2)
-					xOff = -1;
-				if (yOff == 2)
-					yOff = -1;
-
-				int x = x1 + xOff;
-				x = Math.min(bufferedimage.getWidth() - 1, Math.max(0, x));
-				if (x < 0)
-					x = 0;
-				int y = y1 + yOff;
-				y = Math.min(bufferedimage.getHeight() - 1, Math.max(0, y));
+				int x = Math.max(Math.min(bufferedimage.getWidth() - 1, Math.max(0, x1 + Utils.randomInt3(r))), 0);
+				int y = Math.min(bufferedimage.getHeight() - 1, Math.max(0, y1 + Utils.randomInt3(r)));
 
 				Color powerColor = new Color(powerImage.getRGB(x, y));
 				Color skinColor = new Color(bufferedimage.getRGB(x, y));
@@ -109,6 +101,37 @@ public class PowerClientRenderer
 		textureMap.setAccessible(true);
 		Map<MinecraftProfileTexture.Type, ResourceLocation> playerTextures = (Map<MinecraftProfileTexture.Type, ResourceLocation>) textureMap.get(info);
 		playerTextures.put(MinecraftProfileTexture.Type.SKIN, textureManager.getDynamicTextureLocation("power_skin", replacementTexture));
+
+		///
+
+		World w = event.getEntityLiving().world;
+		EntityPlayer entity = event.getEntityPlayer();
+		for (int y = 1; y <= 10; y++)
+		{
+			double radius = (10 - y) + Utils.d(w, 8) * Utils.p(w);
+			for (int i = 0; i < 8; i++)
+			{
+				double deltaX = Math.cos(Math.toRadians(i * 45 + (entity.ticksExisted + event.getPartialRenderTick()) * 6)) * radius;
+				double deltaZ = -Math.sin(Math.toRadians(i * 45 + (entity.ticksExisted + event.getPartialRenderTick()) * 6)) * radius;
+				double finalX = entity.posX + deltaX;
+				double finalZ = entity.posZ + deltaZ;
+				Particle p = Minecraft.getMinecraft().effectRenderer
+						.spawnEffectParticle(EnumParticleTypes.EXPLOSION_LARGE.getParticleID(), finalX, entity.posY + y + Utils.d(w, 4) * Utils.p(w), finalZ, 0,
+								0, 0);
+				if (p != null)
+				{
+					if (r.nextInt(5) == 0)
+					{
+						p.setRBGColorF((float) Math.max(p.getRedColorF() + 0.5, 0.0), (float) Math.max(p.getGreenColorF() - 0.5, 0.0),
+								(float) Math.max(p.getBlueColorF() + 0.5, 0.0));
+					}
+					else
+						p.setRBGColorF((float) Math.max(p.getRedColorF() - 0.5, 0.0), (float) Math.max(p.getGreenColorF() - 0.5, 0.0),
+								(float) Math.max(p.getBlueColorF() - 0.5, 0.0));
+
+				}
+			}
+		}
 	}
 
 	@SubscribeEvent

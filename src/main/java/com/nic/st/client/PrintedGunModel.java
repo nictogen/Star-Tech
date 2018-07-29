@@ -76,7 +76,7 @@ public class PrintedGunModel implements IBakedModel
 			byte[] voxels = ItemPrintedGun.getGunData(stack).getByteArray("voxels");
 			Random r = new Random(123123213L);
 			AxisAlignedBB voxel = new AxisAlignedBB(0, 0, 0, 0.0625, 0.0625, 0.0625);
-			Minecraft.getMinecraft().renderEngine.bindTexture(BlueprintCreatorRenderer.TEXTURE);
+			ClientUtils.bindVoxelTexture();
 
 			GlStateManager.disableLighting();
 			GlStateManager.disableCull();
