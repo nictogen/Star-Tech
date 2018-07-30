@@ -6,6 +6,7 @@ import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.entity.EntityPowerRocket;
 import com.nic.st.items.ItemBlueprint;
+import com.nic.st.items.ItemPowerStone;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -68,6 +69,7 @@ public class StarTech
 	{
 		event.getRegistry().register(new ItemPrintedGun());
 		event.getRegistry().register(new ItemBlueprint());
+		event.getRegistry().register(new ItemPowerStone());
 
 		for (Field field : Blocks.class.getDeclaredFields())
 		{
@@ -75,6 +77,7 @@ public class StarTech
 			Item itemBlock = new ItemBlock(block).setRegistryName(block.getRegistryName()).setUnlocalizedName(block.getUnlocalizedName());
 			event.getRegistry().register(itemBlock);
 		}
+
 	}
 
 	@SubscribeEvent
@@ -134,6 +137,9 @@ public class StarTech
 		public static final Item blueprintCreator = null;
 
 		public static final Item blueprint = null;
+
+		@GameRegistry.ObjectHolder("power_stone")
+		public static final Item powerStone = null;
 	}
 
 	public static class Sounds

@@ -2,6 +2,7 @@ package com.nic.st.items;
 
 import com.nic.st.StarTech;
 import com.nic.st.entity.EntityBullet;
+import com.nic.st.util.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -10,7 +11,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -133,7 +133,7 @@ public class ItemPrintedGun extends Item
 					(handIn == EnumHand.MAIN_HAND) ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
 
 			Vec3d eyes = player.getPositionEyes(0.0f);
-			Vec3d rotVec = getVectorForRotation(player.rotationPitch, (side == EnumHandSide.RIGHT) ? player.rotationYaw + 90 : player.rotationYaw - 90);
+			Vec3d rotVec = Utils.getVectorForRotation(player.rotationPitch, (side == EnumHandSide.RIGHT) ? player.rotationYaw + 90 : player.rotationYaw - 90);
 			Vec3d offset = eyes.add(rotVec.scale(0.3)).subtract(0, 0.1, 0);
 			EntityBullet entityBullet = new EntityBullet(worldIn, player);
 			entityBullet.damage = gunData.getDouble("damage");
@@ -199,14 +199,5 @@ public class ItemPrintedGun extends Item
 		}
 
 		return gunData.getInteger("ammo") > 0;
-	}
-
-	private Vec3d getVectorForRotation(float pitch, float yaw)
-	{
-		float f = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
-		float f1 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
-		float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-		float f3 = MathHelper.sin(-pitch * 0.017453292F);
-		return new Vec3d((double) (f1 * f2), (double) f3, (double) (f * f2));
 	}
 }

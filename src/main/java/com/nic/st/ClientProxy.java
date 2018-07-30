@@ -8,6 +8,7 @@ import com.nic.st.entity.EntityBullet;
 import com.nic.st.entity.EntityPowerRocket;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.util.LimbManipulationUtil;
+import lucraft.mods.lucraftcore.infinity.render.ItemRendererInfinityStone;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -34,6 +35,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +141,7 @@ public class ClientProxy extends CommonProxy
 				throw new RuntimeException("Incorrect field in item sub-class", e);
 			}
 		}
+		StarTech.Items.powerStone.setTileEntityItemStackRenderer(new ItemRendererInfinityStone(new Color(148, 0, 211), new Color(186, 85, 211)));
 	}
 
 	@SubscribeEvent

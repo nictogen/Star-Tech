@@ -2,6 +2,9 @@
   "variants": {
     "normal": {
       "model": "star-tech:blueprint_creator.obj"
+    },
+    "inventory": {
+      "model": "star-tech:blueprint_creator.obj"
     }
   }
 }

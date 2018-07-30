@@ -5,10 +5,7 @@ import com.nic.st.blocks.BlockHologram;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -235,6 +232,15 @@ public class Utils
 		return farthestEmptyIndex;
 	}
 
+	public static Vec3d getVectorForRotation(float pitch, float yaw)
+	{
+		float f = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
+		float f1 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
+		float f2 = -MathHelper.cos(-pitch * 0.017453292F);
+		float f3 = MathHelper.sin(-pitch * 0.017453292F);
+		return new Vec3d((double) (f1 * f2), (double) f3, (double) (f * f2));
+	}
+
 	/**
 	 * Returns a random integer between -1 and 1
 	 */
@@ -252,14 +258,6 @@ public class Utils
 		if (p == 0)
 			p = -1;
 		return p;
-	}
-
-	public static int i(World w, int range)
-	{
-		int i = 0;
-		while (i == 0)
-			i = w.rand.nextInt(range);
-		return i;
 	}
 
 	public static double d(World w, int divisor)

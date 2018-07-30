@@ -4,16 +4,20 @@ import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.entity.EntityPowerRocket;
+import com.nic.st.items.ItemPowerStone;
 import com.nic.st.util.Utils;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -113,30 +117,75 @@ public class StarTechEventHandler
 	@SubscribeEvent
 	public static void onUpdate(LivingEvent.LivingUpdateEvent event)
 	{
-		if (!event.getEntity().world.isRemote && event.getEntity() instanceof EntityPlayer && event.getEntity().ticksExisted % 20 == 0)
+		if (event.getEntity() instanceof EntityPlayer)
 		{
-			EntityPowerRocket rocket = new EntityPowerRocket(event.getEntity().world, event.getEntityLiving());
-			EnumHand handIn = EnumHand.MAIN_HAND;
-			EnumHandSide side = (((EntityPlayer) event.getEntity()).getPrimaryHand() == EnumHandSide.RIGHT) ?
-					(handIn == EnumHand.MAIN_HAND) ? EnumHandSide.RIGHT : EnumHandSide.LEFT :
-					(handIn == EnumHand.MAIN_HAND) ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
-			Vec3d eyes = event.getEntity().getPositionEyes(0.0f);
-			Vec3d rotVec = getVectorForRotation(event.getEntity().rotationPitch,
-					(side == EnumHandSide.RIGHT) ? event.getEntity().rotationYaw + 90 : event.getEntity().rotationYaw - 90);
-			Vec3d offset = eyes.add(rotVec.scale(0.3)).subtract(0, 0.1, 0);
-			rocket.setLocationAndAngles(offset.x, offset.y, offset.z, rocket.rotationYaw, rocket.rotationPitch);
-			rocket.shoot(event.getEntity(), -45f - event.getEntity().world.rand.nextInt(45), event.getEntity().world.rand.nextInt(360), 0.0f, 0.25f, 0.5f);
-			event.getEntity().world.spawnEntity(rocket);
+			EntityPlayer player = (EntityPlayer) event.getEntity();
+
+			int progress = ItemPowerStone.getPowerStoneDuration(player);
+
+			if (player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
+			{
+				if (!player.world.isRemote && player.ticksExisted % 20 == 0)
+					shootRocket(EnumHand.MAIN_HAND, player);
+				if (player.world.isRemote)
+					smokeRing(player, progress);
+			}
+
+			if (player.getHeldItemOffhand().getItem() instanceof ItemPowerStone)
+			{
+				if (!player.world.isRemote && player.ticksExisted % 20 == 0)
+					shootRocket(EnumHand.OFF_HAND, player);
+				if (player.world.isRemote)
+					smokeRing(player, progress);
+			}
 		}
 	}
 
-	private static Vec3d getVectorForRotation(float pitch, float yaw)
+	private static void shootRocket(EnumHand hand, EntityPlayer player)
 	{
-		float f = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
-		float f1 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
-		float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-		float f3 = MathHelper.sin(-pitch * 0.017453292F);
-		return new Vec3d((double) (f1 * f2), (double) f3, (double) (f * f2));
+		EntityPowerRocket rocket = new EntityPowerRocket(player.world, player);
+		EnumHandSide side = (player.getPrimaryHand() == EnumHandSide.RIGHT) ?
+				(hand == EnumHand.MAIN_HAND) ? EnumHandSide.RIGHT : EnumHandSide.LEFT :
+				(hand == EnumHand.MAIN_HAND) ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
+		Vec3d eyes = player.getPositionEyes(0.0f);
+		Vec3d rotVec = Utils.getVectorForRotation(player.rotationPitch,
+				(side == EnumHandSide.RIGHT) ? player.rotationYaw + 90 : player.rotationYaw - 90);
+		Vec3d offset = eyes.add(rotVec.scale(0.3)).subtract(0, 0.1, 0);
+		rocket.setLocationAndAngles(offset.x, offset.y, offset.z, rocket.rotationYaw, rocket.rotationPitch);
+		rocket.shoot(player, -45f - player.world.rand.nextInt(45), player.world.rand.nextInt(360), 0.0f, 0.25f, 0.5f);
+		player.world.spawnEntity(rocket);
+	}
+
+	private static void smokeRing(EntityPlayer player, int progress)
+	{
+		World w = player.world;
+
+		for (int y = 1; y <= 10 && y <= progress / 10; y++)
+		{
+			double radius = (10 - y) + Utils.d(w, 8) * Utils.p(w);
+			for (int i = 0; i < 8; i++)
+			{
+				double deltaX = Math.cos(Math.toRadians(i * 45 + (player.ticksExisted) * 6)) * radius;
+				double deltaZ = -Math.sin(Math.toRadians(i * 45 + (player.ticksExisted) * 6)) * radius;
+				double finalX = player.posX + deltaX;
+				double finalZ = player.posZ + deltaZ;
+				Particle p = Minecraft.getMinecraft().effectRenderer
+						.spawnEffectParticle(EnumParticleTypes.EXPLOSION_LARGE.getParticleID(), finalX, player.posY + y + Utils.d(w, 4) * Utils.p(w), finalZ, 0,
+								0, 0);
+				if (p != null)
+				{
+					if (player.getRNG().nextInt(5) == 0)
+					{
+						p.setRBGColorF((float) Math.max(p.getRedColorF() + 0.5, 0.0), (float) Math.max(p.getGreenColorF() - 0.5, 0.0),
+								(float) Math.max(p.getBlueColorF() + 0.5, 0.0));
+					}
+					else
+						p.setRBGColorF((float) Math.max(p.getRedColorF() - 0.5, 0.0), (float) Math.max(p.getGreenColorF() - 0.5, 0.0),
+								(float) Math.max(p.getBlueColorF() - 0.5, 0.0));
+
+				}
+			}
+		}
 	}
 
 

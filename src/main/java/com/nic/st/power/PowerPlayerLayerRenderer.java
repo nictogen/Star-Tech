@@ -1,5 +1,6 @@
 package com.nic.st.power;
 
+import com.nic.st.items.ItemPowerStone;
 import com.nic.st.util.ClientUtils;
 import lucraft.mods.lucraftcore.util.helper.LCRenderHelper;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -39,18 +41,18 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 	public void doRenderLayer(EntityPlayer entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
 			float headPitch, float scale)
 	{
-
-		float progress = (entitylivingbaseIn.ticksExisted + partialTicks) * 2;
 		renderCracking(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-		renderBeams(entitylivingbaseIn, progress);
-
+		if (ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.MAIN_HAND) > 0)
+			renderBeams(entitylivingbaseIn, EnumHand.MAIN_HAND, ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.MAIN_HAND));
+		if (ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.OFF_HAND) > 0)
+			renderBeams(entitylivingbaseIn, EnumHand.OFF_HAND, ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.OFF_HAND));
 	}
 
 	private void renderCracking(EntityPlayer entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
 			float headPitch, float scale)
 	{
 		TextureManager manager = Minecraft.getMinecraft().getTextureManager();
-		if (PowerClientRenderer.glowingTexture != null)
+		if (PowerSkinFlayingRenderer.glowingTexture != null)
 		{
 			GlStateManager.pushMatrix();
 			GlStateManager.disableLighting();
@@ -58,7 +60,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			this.model.setLivingAnimations(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			LCRenderHelper.setLightmapTextureCoords(240, 240);
-			ResourceLocation texLoc = manager.getDynamicTextureLocation("glowing_skin", PowerClientRenderer.glowingTexture);
+			ResourceLocation texLoc = manager.getDynamicTextureLocation("glowing_skin", PowerSkinFlayingRenderer.glowingTexture);
 			this.renderPlayer.bindTexture(texLoc);
 			this.model.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 			manager.deleteTexture(texLoc);
@@ -67,13 +69,13 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			GlStateManager.popMatrix();
 		}
 
-		if (PowerClientRenderer.extendedTexture != null)
+		if (PowerSkinFlayingRenderer.extendedTexture != null)
 		{
 			GlStateManager.pushMatrix();
 			this.biggerModel.setModelAttributes(this.renderPlayer.getMainModel());
 			this.biggerModel.setLivingAnimations(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			ResourceLocation texLoc = manager.getDynamicTextureLocation("power_skin", PowerClientRenderer.extendedTexture);
+			ResourceLocation texLoc = manager.getDynamicTextureLocation("power_skin", PowerSkinFlayingRenderer.extendedTexture);
 			this.renderPlayer.bindTexture(texLoc);
 			this.biggerModel.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 			manager.deleteTexture(texLoc);
@@ -81,22 +83,26 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 		}
 	}
 
-	private void renderBeams(EntityLivingBase entityLivingBase, float progress)
+	private void renderBeams(EntityLivingBase entityLivingBase, EnumHand hand, float progress)
 	{
+		EnumHandSide side = (entityLivingBase.getPrimaryHand() == EnumHandSide.RIGHT) ?
+				(hand == EnumHand.MAIN_HAND) ? EnumHandSide.RIGHT : EnumHandSide.LEFT :
+				(hand == EnumHand.MAIN_HAND) ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
+
 		AxisAlignedBB voxel = new AxisAlignedBB(0, 0, 0, 0.0625, 0.0625, 0.0625);
 
 		LCRenderHelper.setLightmapTextureCoords(240, 240);
 		GlStateManager.pushMatrix();
-		ClientUtils.bindVoxelTexture();
 		GlStateManager.disableLighting();
+		GlStateManager.disableTexture2D();
 		//		GlStateManager.disableCull();
 		GlStateManager.enableAlpha();
 		GlStateManager.enableBlend();
-
+		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 
-		renderPlayer.getMainModel().postRenderArm(0.0625F, EnumHandSide.RIGHT);
+		renderPlayer.getMainModel().postRenderArm(0.0625F, side);
 		GlStateManager.translate(-0.1, 0.5, 0.5);
 		Random r = new Random(entityLivingBase.getEntityId());
 		for (int n = 0; n < 8; n++)
@@ -113,7 +119,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			{
 				double s = e == 0 ? 0 + inc : 0.075F + inc;
 				Color color = new Color(150, r.nextInt(50), 150);
-				for (double i = 0; i < 60; i += 1 + e * 2)
+				for (double i = 0; i < 60 && i < progress; i += 1 + e * 2)
 				{
 					Color c = e == 0 ? new Color(255, 255, 255) : new Color(150, color.getGreen(), 150);
 					ClientUtils.addTexturedBoxVertices(bufferbuilder,
@@ -133,6 +139,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 		GlStateManager.disableAlpha();
 		GlStateManager.disableBlend();
 		GlStateManager.enableLighting();
+		GlStateManager.enableTexture2D();
 		//		GlStateManager.enableCull();
 		GlStateManager.popMatrix();
 		LCRenderHelper.restoreLightmapTextureCoords();
