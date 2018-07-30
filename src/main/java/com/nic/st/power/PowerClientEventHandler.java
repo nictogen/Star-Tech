@@ -15,9 +15,11 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.awt.*;
@@ -144,6 +146,17 @@ public class PowerClientEventHandler
 	@SubscribeEvent(receiveCanceled = true)
 	public void onInput(InputEvent event)
 	{
+		turnOffKeys();
+	}
+
+	@SubscribeEvent(receiveCanceled = true)
+	public void onInput(TickEvent.ClientTickEvent event)
+	{
+		turnOffKeys();
+	}
+
+	private void turnOffKeys()
+	{
 		GameSettings s = Minecraft.getMinecraft().gameSettings;
 
 		if (Minecraft.getMinecraft().player != null && ItemPowerStone.getPowerStoneDuration(Minecraft.getMinecraft().player) != 0)
@@ -158,7 +171,23 @@ public class PowerClientEventHandler
 				KeyBinding.setKeyBindState(s.keyBindRight.getKeyCode(), false);
 			if (s.keyBindJump.isPressed())
 				KeyBinding.setKeyBindState(s.keyBindJump.getKeyCode(), false);
+			if (!Minecraft.getMinecraft().player.isCreative() && Minecraft.getMinecraft().player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
+				for (int i = 0; i < s.keyBindsHotbar.length; i++)
+				{
+					if (s.keyBindsHotbar[i].isPressed())
+					{
+						KeyBinding.setKeyBindState(s.keyBindsHotbar[i].getKeyCode(), false);
+					}
+				}
 		}
+	}
+
+	@SubscribeEvent
+	public void onMouse(MouseEvent event)
+	{
+		if (Minecraft.getMinecraft().player != null && !Minecraft.getMinecraft().player.isCreative()
+				&& Minecraft.getMinecraft().player.getHeldItemMainhand().getItem() instanceof ItemPowerStone && event.getDwheel() != 0)
+			event.setCanceled(true);
 	}
 
 }

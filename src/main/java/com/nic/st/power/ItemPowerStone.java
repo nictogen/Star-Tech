@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class ItemPowerStone extends ItemInfinityStone
 {
+	//TODO convert right click to ability
 	public ItemPowerStone()
 	{
 		setRegistryName(StarTech.MODID, "power_stone");

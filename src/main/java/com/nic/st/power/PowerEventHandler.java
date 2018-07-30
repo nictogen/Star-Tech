@@ -27,14 +27,6 @@ public class PowerEventHandler
 			EntityPlayer player = (EntityPlayer) event.getEntity();
 
 			int progress = ItemPowerStone.getPowerStoneDuration(player);
-
-			if (progress > 0)
-			{
-				player.motionX = 0;
-				if (player.motionY > 0)
-					player.motionY = 0;
-				player.motionZ = 0;
-			}
 			if (player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
 			{
 				if (!player.world.isRemote && player.ticksExisted % 20 == 0)
