@@ -2,7 +2,6 @@ package com.nic.st.power;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.nic.st.StarTech;
-import com.nic.st.items.ItemPowerStone;
 import com.nic.st.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -11,12 +10,14 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.awt.*;
@@ -28,11 +29,11 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Created by Nictogen on 4/25/18.
+ * Created by Nictogen on 7/30/18.
  */
-@Mod.EventBusSubscriber
-public class PowerSkinFlayingRenderer
+public class PowerClientEventHandler
 {
+
 	private static final ResourceLocation POWER_BACKGROUND = new ResourceLocation(StarTech.MODID, "textures/power_background.png");
 	public static DynamicTexture extendedTexture = null;
 	public static DynamicTexture glowingTexture = null;
@@ -42,7 +43,7 @@ public class PowerSkinFlayingRenderer
 	private static World lastWorld = null;
 
 	@SubscribeEvent
-	public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) throws IOException, IllegalAccessException
+	public void onRenderPlayerPre(RenderPlayerEvent.Pre event) throws IOException, IllegalAccessException
 	{
 		if (lastWorld != event.getEntityPlayer().world)
 		{
@@ -107,7 +108,7 @@ public class PowerSkinFlayingRenderer
 	}
 
 	@SubscribeEvent
-	public static void onRenderPlayerPost(RenderPlayerEvent.Post event) throws IllegalAccessException
+	public void onRenderPlayerPost(RenderPlayerEvent.Post event) throws IllegalAccessException
 	{
 
 		if (skin != null)
@@ -139,4 +140,25 @@ public class PowerSkinFlayingRenderer
 			glowingTexture = null;
 		}
 	}
+
+	@SubscribeEvent(receiveCanceled = true)
+	public void onInput(InputEvent event)
+	{
+		GameSettings s = Minecraft.getMinecraft().gameSettings;
+
+		if (Minecraft.getMinecraft().player != null && ItemPowerStone.getPowerStoneDuration(Minecraft.getMinecraft().player) != 0)
+		{
+			if (s.keyBindForward.isPressed())
+				KeyBinding.setKeyBindState(s.keyBindForward.getKeyCode(), false);
+			if (s.keyBindBack.isPressed())
+				KeyBinding.setKeyBindState(s.keyBindBack.getKeyCode(), false);
+			if (s.keyBindLeft.isPressed())
+				KeyBinding.setKeyBindState(s.keyBindLeft.getKeyCode(), false);
+			if (s.keyBindRight.isPressed())
+				KeyBinding.setKeyBindState(s.keyBindRight.getKeyCode(), false);
+			if (s.keyBindJump.isPressed())
+				KeyBinding.setKeyBindState(s.keyBindJump.getKeyCode(), false);
+		}
+	}
+
 }

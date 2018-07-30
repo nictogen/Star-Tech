@@ -1,6 +1,5 @@
 package com.nic.st.power;
 
-import com.nic.st.items.ItemPowerStone;
 import com.nic.st.util.ClientUtils;
 import lucraft.mods.lucraftcore.util.helper.LCRenderHelper;
 import net.minecraft.client.Minecraft;
@@ -52,7 +51,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			float headPitch, float scale)
 	{
 		TextureManager manager = Minecraft.getMinecraft().getTextureManager();
-		if (PowerSkinFlayingRenderer.glowingTexture != null)
+		if (PowerClientEventHandler.glowingTexture != null)
 		{
 			GlStateManager.pushMatrix();
 			GlStateManager.disableLighting();
@@ -60,7 +59,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			this.model.setLivingAnimations(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			LCRenderHelper.setLightmapTextureCoords(240, 240);
-			ResourceLocation texLoc = manager.getDynamicTextureLocation("glowing_skin", PowerSkinFlayingRenderer.glowingTexture);
+			ResourceLocation texLoc = manager.getDynamicTextureLocation("glowing_skin", PowerClientEventHandler.glowingTexture);
 			this.renderPlayer.bindTexture(texLoc);
 			this.model.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 			manager.deleteTexture(texLoc);
@@ -69,13 +68,13 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			GlStateManager.popMatrix();
 		}
 
-		if (PowerSkinFlayingRenderer.extendedTexture != null)
+		if (PowerClientEventHandler.extendedTexture != null)
 		{
 			GlStateManager.pushMatrix();
 			this.biggerModel.setModelAttributes(this.renderPlayer.getMainModel());
 			this.biggerModel.setLivingAnimations(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			ResourceLocation texLoc = manager.getDynamicTextureLocation("power_skin", PowerSkinFlayingRenderer.extendedTexture);
+			ResourceLocation texLoc = manager.getDynamicTextureLocation("power_skin", PowerClientEventHandler.extendedTexture);
 			this.renderPlayer.bindTexture(texLoc);
 			this.biggerModel.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 			manager.deleteTexture(texLoc);

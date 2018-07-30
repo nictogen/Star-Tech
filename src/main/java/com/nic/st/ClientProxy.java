@@ -3,10 +3,15 @@ package com.nic.st;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
-import com.nic.st.client.*;
+import com.nic.st.client.BlueprintCreatorRenderer;
+import com.nic.st.client.BulletRenderer;
+import com.nic.st.client.PrintedGunModel;
+import com.nic.st.client.PrinterRenderer;
 import com.nic.st.entity.EntityBullet;
-import com.nic.st.entity.EntityPowerRocket;
 import com.nic.st.items.ItemPrintedGun;
+import com.nic.st.power.EntityPowerRocket;
+import com.nic.st.power.PowerClientEventHandler;
+import com.nic.st.power.PowerRocketRenderer;
 import com.nic.st.util.LimbManipulationUtil;
 import lucraft.mods.lucraftcore.infinity.render.ItemRendererInfinityStone;
 import net.minecraft.block.Block;
@@ -28,6 +33,7 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -102,6 +108,7 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, BulletRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityPowerRocket.class, PowerRocketRenderer::new);
 		OBJLoader.INSTANCE.addDomain(StarTech.MODID);
+		MinecraftForge.EVENT_BUS.register(new PowerClientEventHandler());
 	}
 
 	@Override public void postInit(FMLPostInitializationEvent event)

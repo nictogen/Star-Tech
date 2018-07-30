@@ -1,4 +1,4 @@
-package com.nic.st.entity;
+package com.nic.st.power;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;

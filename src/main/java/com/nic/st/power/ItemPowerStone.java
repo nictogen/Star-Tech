@@ -1,13 +1,11 @@
-package com.nic.st.items;
+package com.nic.st.power;
 
 import com.nic.st.StarTech;
 import lucraft.mods.lucraftcore.infinity.EnumInfinityStone;
 import lucraft.mods.lucraftcore.infinity.items.ItemInfinityStone;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
@@ -89,14 +87,15 @@ public class ItemPowerStone extends ItemInfinityStone
 		else
 			stack.getTagCompound().setInteger("power_use", 0);
 
-		return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+		return new ActionResult<>(EnumActionResult.PASS, stack);
 	}
 
 	@Override public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
 	{
 		if (!stack.hasTagCompound())
 			stack.setTagCompound(new NBTTagCompound());
-		if (isSelected)
+		if (entityIn instanceof EntityPlayer && (((EntityPlayer) entityIn).getHeldItemMainhand() == stack
+				|| ((EntityPlayer) entityIn).getHeldItemOffhand() == stack))
 		{
 			stack.getTagCompound().setInteger("power_duration", stack.getTagCompound().getInteger("power_duration") + 1);
 		}
@@ -107,24 +106,8 @@ public class ItemPowerStone extends ItemInfinityStone
 		}
 	}
 
-	/**
-	 * returns the action that specifies what animation to play when the items is being used
-	 */
-	public EnumAction getItemUseAction(ItemStack stack)
-	{
-		return EnumAction.NONE;
-	}
-
-	public int getMaxItemUseDuration(ItemStack stack)
-	{
-		return 72000;
-	}
-
-	@Override public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entityLiving, int timeLeft)
-	{
-		//		stack.getTagCompound().setInteger("power_use", 0);
-		//		super.onPlayerStoppedUsing(stack, worldIn, entityLiving, timeLeft);
-	}
+	//TODO add "if (getItem().getItem().onEntityItemUpdate(this)) return;"
+	// to EntityItemIndestructible
 
 	@Override public boolean onEntityItemUpdate(EntityItem entityItem)
 	{

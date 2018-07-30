@@ -1,6 +1,5 @@
-package com.nic.st.client;
+package com.nic.st.power;
 
-import com.nic.st.entity.EntityPowerRocket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.entity.RenderManager;
