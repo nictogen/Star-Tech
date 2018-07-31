@@ -12,6 +12,7 @@ import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.power.EntityPowerRocket;
 import com.nic.st.power.PowerClientEventHandler;
 import com.nic.st.power.PowerRocketRenderer;
+import com.nic.st.util.ClientUtils;
 import com.nic.st.util.LimbManipulationUtil;
 import lucraft.mods.lucraftcore.infinity.render.ItemRendererInfinityStone;
 import net.minecraft.block.Block;
@@ -30,6 +31,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
@@ -189,5 +191,11 @@ public class ClientProxy extends CommonProxy
 		{
 			event.setCanceled(true);
 		}
+	}
+
+	@SubscribeEvent
+	public void onTextureStitch(TextureStitchEvent.Pre event)
+	{
+		event.getMap().registerSprite(ClientUtils.VOXEL_TEXTURE_FOR_ATLAS);
 	}
 }
