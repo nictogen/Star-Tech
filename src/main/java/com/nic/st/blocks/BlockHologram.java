@@ -2,6 +2,7 @@ package com.nic.st.blocks;
 
 import com.nic.st.util.Utils;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,9 +21,17 @@ public class BlockHologram extends Block
 {
 	public static final AxisAlignedBB HOLO_BOX = new AxisAlignedBB(0, 1.5, 0.25, 1, 2, 0.75);
 
+	public static final Material HOLOGRAM = (new Material(MapColor.BLUE)
+	{
+		public boolean blocksMovement()
+		{
+			return false;
+		}
+	});
+
 	public BlockHologram()
 	{
-		super(Material.IRON);
+		super(HOLOGRAM);
 		setRegistryName("star-tech:hologram");
 		setUnlocalizedName("hologram");
 		setBlockUnbreakable();
@@ -59,7 +68,7 @@ public class BlockHologram extends Block
 
 	@Nullable @Override public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
 	{
-		return HOLO_BOX.offset(0, -1, 0);
+		return null;
 	}
 
 	@Override public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer)
