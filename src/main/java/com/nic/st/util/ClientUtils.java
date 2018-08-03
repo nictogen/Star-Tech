@@ -64,38 +64,49 @@ public class ClientUtils
 		Minecraft.getMinecraft().renderEngine.bindTexture(VOXEL_TEXTURE);
 	}
 
-	public static List<BakedQuad> createQuads(byte[] voxels)
+	public static List<BakedQuad> createQuads(byte[] voxels, int ammo)
 	{
-		int ammo = 0; //TODO
 		AxisAlignedBB voxel = new AxisAlignedBB(0, 0, 0, 0.0625, 0.0625, 0.0625);
 		ArrayList<BakedQuad> quads = new ArrayList<>();
 		TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(VOXEL_TEXTURE_FOR_ATLAS.toString());
 		int size = 8;
 		for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vX = i % size, vY = (i % (size * size)) / size, vZ = i / (size * size))
 		{
-			//			Color color = (voxels[i] == 1) ?
-			//					new Color(1.0f, 0.85f, 0.0f) :
-			//					(voxels[i] == 2) ?
-			//							new Color(0.5f, 0.5f, 0.5f) :
-			//							(voxels[i] == 3) ?
-			//									new Color(0.3f, 0.3f, 0.3f) :
-			//									(ammo-- > 0) ?
-			//											new Color(0.2f, 0.4f, 1.0f) : new Color(0.3f, 0.3f, 0.5f);
-			Color color = Color.WHITE;
-
+			int tintIndex = voxels[i] != 4 ? voxels[i] : (ammo-- > 0) ? 4 : 5;
 			for (EnumFacing facing : EnumFacing.values())
 			{
 				if (voxels[i] != 0 && getByteInDirection(facing, i, voxels, size, size, size) == 0)
 				{
+					float brightness = getFaceBrightness(facing);
 					AxisAlignedBB bb = voxel.offset(vX * 0.0625, vY * 0.0625, vZ * 0.0625);
-					addQuad(quads, bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, color, facing, sprite);
+					addQuad(quads, bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, new Color(brightness, brightness, brightness), tintIndex, facing,
+							sprite);
 				}
 			}
 		}
 		return quads;
 	}
 
-	//x = east, z = south
+	private static float getFaceBrightness(EnumFacing facing)
+	{
+		switch (facing)
+		{
+		case DOWN:
+			return 0.5F;
+		case UP:
+			return 1.0F;
+		case NORTH:
+		case SOUTH:
+			return 0.8F;
+		case WEST:
+		case EAST:
+			return 0.6F;
+		default:
+			return 1.0F;
+		}
+	}
+
+	//x = east, z = south TODO
 	private static byte getByteInDirection(EnumFacing facing, int i, byte[] voxels, int x, int y, int z)
 	{
 		return 0;
@@ -132,7 +143,7 @@ public class ClientUtils
 	}
 
 	public static void addQuad(List<BakedQuad> quads, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color color,
-			EnumFacing facing, TextureAtlasSprite sprite)
+			int tintIndex, EnumFacing facing, TextureAtlasSprite sprite)
 	{
 
 		switch (facing)
@@ -143,7 +154,7 @@ public class ClientUtils
 					new double[] { maxX, minY, minZ }, 16, 0,
 					new double[] { maxX, minY, maxZ }, 16, 16,
 					new double[] { minX, minY, maxZ }, 0, 16,
-					color, EnumFacing.DOWN, sprite));
+					color, tintIndex, EnumFacing.DOWN, sprite));
 			break;
 		case UP:
 			quads.add(createBakedQuad(
@@ -151,7 +162,7 @@ public class ClientUtils
 					new double[] { maxX, maxY, minZ }, 16, 0,
 					new double[] { maxX, maxY, maxZ }, 16, 16,
 					new double[] { minX, maxY, maxZ }, 0, 16,
-					color, EnumFacing.UP, sprite));
+					color, tintIndex, EnumFacing.UP, sprite));
 			break;
 		case NORTH:
 			quads.add(createBakedQuad(
@@ -159,7 +170,7 @@ public class ClientUtils
 					new double[] { maxX, maxY, minZ }, 16, 0,
 					new double[] { maxX, minY, minZ }, 16, 16,
 					new double[] { minX, minY, minZ }, 0, 16,
-					color, EnumFacing.NORTH, sprite));
+					color, tintIndex, EnumFacing.NORTH, sprite));
 			break;
 		case SOUTH:
 			quads.add(createBakedQuad(
@@ -167,7 +178,7 @@ public class ClientUtils
 					new double[] { minX, maxY, maxZ }, 16, 0,
 					new double[] { minX, minY, maxZ }, 16, 16,
 					new double[] { maxX, minY, maxZ }, 0, 16,
-					color, EnumFacing.SOUTH, sprite));
+					color, tintIndex, EnumFacing.SOUTH, sprite));
 			break;
 		case EAST:
 			quads.add(createBakedQuad(
@@ -175,7 +186,7 @@ public class ClientUtils
 					new double[] { maxX, maxY, minZ }, 16, 0,
 					new double[] { maxX, minY, minZ }, 16, 16,
 					new double[] { maxX, minY, maxZ }, 0, 16,
-					color, EnumFacing.EAST, sprite));
+					color, tintIndex, EnumFacing.EAST, sprite));
 			break;
 		case WEST:
 			quads.add(createBakedQuad(
@@ -183,7 +194,7 @@ public class ClientUtils
 					new double[] { minX, maxY, minZ }, 16, 0,
 					new double[] { minX, minY, minZ }, 16, 16,
 					new double[] { minX, minY, maxZ }, 0, 16,
-					color, EnumFacing.WEST, sprite));
+					color, tintIndex, EnumFacing.WEST, sprite));
 			break;
 		}
 	}
@@ -193,12 +204,12 @@ public class ClientUtils
 			double[] p2, float u2, float v2,
 			double[] p3, float u3, float v3,
 			double[] p4, float u4, float v4,
-			Color color, EnumFacing side, TextureAtlasSprite sprite)
+			Color color, int tintIndex, EnumFacing side, TextureAtlasSprite sprite)
 	{
 		return new BakedQuad(Ints.concat(vertexToInts(p1[0], p1[1], p1[2], u1, v1, color, sprite),
 				vertexToInts(p2[0], p2[1], p2[2], u2, v2, color, sprite),
 				vertexToInts(p3[0], p3[1], p3[2], u3, v3, color, sprite),
-				vertexToInts(p4[0], p4[1], p4[2], u4, v4, color, sprite)), -1, side, sprite, false, DefaultVertexFormats.POSITION_TEX_COLOR);
+				vertexToInts(p4[0], p4[1], p4[2], u4, v4, color, sprite)), tintIndex, side, sprite, false, DefaultVertexFormats.POSITION_TEX_COLOR);
 	}
 
 	private static int[] vertexToInts(double x, double y, double z, float u, float v, Color color, TextureAtlasSprite sprite)

@@ -9,9 +9,6 @@ import com.nic.st.client.PrintedGunModel;
 import com.nic.st.client.PrinterRenderer;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.items.ItemPrintedGun;
-import com.nic.st.power.EntityPowerRocket;
-import com.nic.st.power.PowerClientEventHandler;
-import com.nic.st.power.PowerRocketRenderer;
 import com.nic.st.util.ClientUtils;
 import com.nic.st.util.LimbManipulationUtil;
 import lucraft.mods.lucraftcore.infinity.render.ItemRendererInfinityStone;
@@ -35,9 +32,9 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -47,6 +44,9 @@ import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+//import com.nic.st.power.PowerClientEventHandler;
+//import com.nic.st.power.PowerRocketRenderer;
 
 /**
  * Created by Nictogen on 4/3/18.
@@ -108,9 +108,14 @@ public class ClientProxy extends CommonProxy
 	{
 		ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
 		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, BulletRenderer::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityPowerRocket.class, PowerRocketRenderer::new);
+		//		RenderingRegistry.registerEntityRenderingHandler(EntityPowerRocket.class, PowerRocketRenderer::new);
 		OBJLoader.INSTANCE.addDomain(StarTech.MODID);
-		MinecraftForge.EVENT_BUS.register(new PowerClientEventHandler());
+		//		MinecraftForge.EVENT_BUS.register(new PowerClientEventHandler());
+	}
+
+	@Override public void init(FMLInitializationEvent event)
+	{
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new PrintedGunModel.PrintedGunColorizer(), StarTech.Items.printedGun);
 	}
 
 	@Override public void postInit(FMLPostInitializationEvent event)

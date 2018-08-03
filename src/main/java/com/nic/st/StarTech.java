@@ -99,6 +99,7 @@ public class StarTech
 	{
 		GameRegistry.registerTileEntity(BlockBlueprintCreator.TileEntityBlueprintCreator.class, "star-tech:blueprint_creator");
 		GameRegistry.registerTileEntity(BlockPrinter.TileEntityPrinter.class, "star-tech:printer");
+		proxy.init(event);
 	}
 
 	@EventHandler
