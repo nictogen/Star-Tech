@@ -73,14 +73,18 @@ public class ClientUtils
 		for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vX = i % size, vY = (i % (size * size)) / size, vZ = i / (size * size))
 		{
 			int tintIndex = voxels[i] != 4 ? voxels[i] : (ammo-- > 0) ? 4 : 5;
-			for (EnumFacing facing : EnumFacing.values())
+
+			if (voxels[i] != 0)
 			{
-				if (voxels[i] != 0 && getByteInDirection(facing, i, voxels, size, size, size) == 0)
+				for (EnumFacing facing : EnumFacing.values())
 				{
-					float brightness = getFaceBrightness(facing);
-					AxisAlignedBB bb = voxel.offset(vX * 0.0625, vY * 0.0625, vZ * 0.0625);
-					addQuad(quads, bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, new Color(brightness, brightness, brightness), tintIndex, facing,
-							sprite);
+					if (getByteInDirection(facing, i, voxels, size, size, size) == 0)
+					{
+						float brightness = getFaceBrightness(facing);
+						AxisAlignedBB bb = voxel.offset(vX * 0.0625, vY * 0.0625, vZ * 0.0625);
+						addQuad(quads, bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, new Color(brightness, brightness, brightness), tintIndex, facing,
+								sprite);
+					}
 				}
 			}
 		}

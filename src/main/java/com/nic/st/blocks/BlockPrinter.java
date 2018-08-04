@@ -154,13 +154,27 @@ public class BlockPrinter extends Block
 			{
 				ticks++;
 				gun = new ItemStack(StarTech.Items.printedGun, 1);
-				ItemPrintedGun.createGunData(blueprint.getTagCompound().getByteArray("voxels"), gun);
+				ItemPrintedGun.createGunData(new byte[0], gun);
 				IBlockState state = getWorld().getBlockState(getPos());
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
 			}
 			else if (ticks > 0 && getWorld().isBlockPowered(getPos()) && blueprint.getItem() instanceof ItemBlueprint)
-				ticks += 5;
+			{
+				ticks += 500;
+				byte[] blueprintArray = blueprint.getTagCompound().getByteArray("voxels");
+				byte[] newArray = new byte[blueprintArray.length];
+				for (int i = blueprintArray.length - 1, n = 0; ticks >= n * 200 && i >= 0; i--)
+				{
+					newArray[i] = blueprintArray[i];
+					if (blueprintArray[i] != 0)
+						n++;
+				}
+				ItemPrintedGun.createGunData(newArray, gun);
+				IBlockState state = getWorld().getBlockState(getPos());
+				markDirty();
+				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
+			}
 			else if (ticks != 0 && (!getWorld().isBlockPowered(getPos()) || blueprint.isEmpty()))
 			{
 				gun = ItemStack.EMPTY;
@@ -173,6 +187,10 @@ public class BlockPrinter extends Block
 			if (!blueprint.isEmpty() && ticks > blueprint.getTagCompound().getInteger("total") * 200)
 			{
 				ticks = 0;
+				ItemPrintedGun.createGunData(blueprint.getTagCompound().getByteArray("voxels"), gun);
+				IBlockState state = getWorld().getBlockState(getPos());
+				markDirty();
+				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
 			}
 		}
 

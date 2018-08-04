@@ -1,5 +1,6 @@
 package com.nic.st.client;
 
+import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.util.ClientUtils;
@@ -9,13 +10,15 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.util.Random;
 
 /**
@@ -37,8 +40,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		Vec3d hitVec = mc.player.getPositionEyes(partialTicks);
 		Vec3d lookPos = mc.player.getLook(partialTicks);
 		hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
-		int lookVoxel = Utils
-				.getVoxel(BlockHologram.HOLO_BOX.offset(te.getPos()), mc.player.getPositionEyes(partialTicks), hitVec, te.voxels, te.getPos());
+		int lookVoxel = Utils.getVoxel(BlockHologram.HOLO_BOX.offset(te.getPos()), mc.player.getPositionEyes(partialTicks), hitVec, te.voxels, te.getPos());
 
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -68,25 +70,38 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 
 		//Voxels
 		Random r = new Random(123123213L);
-		for (int i = 0, vX = 0, vY = 0, vZ = 0; i < te.voxels.length; i++, vX = i / 64, vY = (i % 64) / 8, vZ = i % 8)
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(te.getPos().getX(), te.getPos().getY() + 1.5, te.getPos().getZ() + 0.75);
+		GlStateManager.rotate(90, 0, 1, 0);
+		for (BakedQuad bakedQuad : ClientUtils.createQuads(te.voxels, 1000000))
 		{
-			float shade = ((float) r.nextInt(32)) * 0.001953125f;
-			if (te.voxels[i] != 0)
-			{
-				Color color = (te.voxels[i] == 1) ?
-						new Color(1.0f - shade, 0.85f - shade, 0.0f) :
-						(te.voxels[i] == 2) ?
-								new Color(0.5f - shade, 0.5f - shade, 0.5f - shade) :
-								(te.voxels[i] == 3) ? new Color(0.3f - shade, 0.3f - shade, 0.3f - shade) : new Color(0.2f - shade, 0.4f - shade, 1.0f - shade);
+			int[] data = bakedQuad.getVertexData();
+			bufferbuilder.addVertexData(data);
+			int color = Minecraft.getMinecraft().getItemColors().colorMultiplier(new ItemStack(StarTech.Items.printedGun), bakedQuad.getTintIndex());
 
-				ClientUtils.addTexturedBoxVertices(bufferbuilder,
-						voxel.offset(te.getPos().getX() + vX * 0.0625, te.getPos().getY() + vY * 0.0625 + 1.5, te.getPos().getZ() + vZ * 0.0625 + 0.25),
-						((float) color.getRed()) / 255f,
-						((float) color.getGreen()) / 255f, ((float) color.getBlue()) / 255f,
-						1.0f);
+			float cb = color & 0xFF;
+			float cg = (color >>> 8) & 0xFF;
+			float cr = (color >>> 16) & 0xFF;
+			float ca = (color >>> 24) & 0xFF;
+			VertexFormat format = DefaultVertexFormats.POSITION_TEX_COLOR;
+			int size = format.getIntegerSize();
+			int offset = format.getColorOffset() / 4; // assumes that color is aligned
+			for (int i = 0; i < 4; i++)
+			{
+				int vc = data[offset + size * i];
+				float vcr = vc & 0xFF;
+				float vcg = (vc >>> 8) & 0xFF;
+				float vcb = (vc >>> 16) & 0xFF;
+				float vca = (vc >>> 24) & 0xFF;
+				int ncr = Math.min(0xFF, (int) (cr * vcr / 0xFF));
+				int ncg = Math.min(0xFF, (int) (cg * vcg / 0xFF));
+				int ncb = Math.min(0xFF, (int) (cb * vcb / 0xFF));
+				int nca = Math.min(0xFF, (int) (ca * vca / 0xFF));
+				bufferbuilder.putColorRGBA(bufferbuilder.getColorIndex(4 - i), ncr, ncg, ncb, nca);
 			}
 		}
 		tessellator.draw();
+		GlStateManager.popMatrix();
 
 		if (lookVoxel != -1)
 		{
