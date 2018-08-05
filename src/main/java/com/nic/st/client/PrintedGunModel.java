@@ -70,27 +70,27 @@ public class PrintedGunModel implements IBakedModel
 	{
 		if (cameraTransformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND)
 		{
-			return Pair.of(this, new TRSRTransformation(new Vector3f(-0.25f, 0.35f, -0.3f), null, null, null).getMatrix());
+			return Pair.of(this, new TRSRTransformation(new Vector3f(0.25f, 0.35f, -0.3f), new Quat4f(0, 1, 0, 1), null, null).getMatrix());
 		}
 		if (cameraTransformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND)
 		{
-			return Pair.of(this, new TRSRTransformation(new Vector3f(0.25f, 0.35f, -0.3f), null, null, null).getMatrix());
+			return Pair.of(this, new TRSRTransformation(new Vector3f(-0.25f, 0.35f, -0.3f), new Quat4f(0, 1, 0, -1), null, null).getMatrix());
 		}
 		if (cameraTransformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND)
 		{
-			return Pair.of(this, new TRSRTransformation(new Vector3f(0.25f, 0.35f, -0.3f), null, null, null).getMatrix());
+			return Pair.of(this, new TRSRTransformation(new Vector3f(-0.25f, 0.35f, -0.3f), new Quat4f(0, 1, 0, -1), null, null).getMatrix());
 		}
 		if (cameraTransformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND)
 		{
-			return Pair.of(this, new TRSRTransformation(new Vector3f(-0.25f, 0.35f, -0.3f), null, null, null).getMatrix());
+			return Pair.of(this, new TRSRTransformation(new Vector3f(0.25f, 0.35f, -0.3f), new Quat4f(0, 1, 0, 1), null, null).getMatrix());
 		}
 		if (cameraTransformType == ItemCameraTransforms.TransformType.GUI)
 		{
-			return Pair.of(this, new TRSRTransformation(new Vector3f(0.2f, 0.35f, -0.3f), new Quat4f(0.5f, 1, -0.25f, 1), null, null).getMatrix());
+			return Pair.of(this, new TRSRTransformation(new Vector3f(0.2f, 0.35f, -0.3f), new Quat4f(0.0f, 0.0f, -0.5f, 1.0f), null, null).getMatrix());
 		}
 		if (cameraTransformType == ItemCameraTransforms.TransformType.GROUND)
 		{
-			return Pair.of(this, new TRSRTransformation(new Vector3f(0.2f, 0.35f, -0.3f), new Quat4f(0, 0, 0, 1), null, null).getMatrix());
+			return Pair.of(this, new TRSRTransformation(new Vector3f(0.0f, 0.35f, 0.0f), new Quat4f(0, 0, 0, 1), null, null).getMatrix());
 		}
 		return net.minecraftforge.client.ForgeHooksClient.handlePerspective(this, cameraTransformType);
 	}

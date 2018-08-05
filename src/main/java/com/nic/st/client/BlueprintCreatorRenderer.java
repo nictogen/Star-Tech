@@ -19,13 +19,16 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Nictogen on 4/1/18.
  */
 public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlueprintCreator.TileEntityBlueprintCreator>
 {
+	private HashMap<BlockBlueprintCreator.TileEntityBlueprintCreator, List<BakedQuad>> quadCache = new HashMap<>();
+
 	@Override
 	public void render(BlockBlueprintCreator.TileEntityBlueprintCreator te, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
 	{
@@ -65,15 +68,18 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		tessellator.draw();
 		GlStateManager.popMatrix();
 
-
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 
 		//Voxels
-		Random r = new Random(123123213L);
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(te.getPos().getX(), te.getPos().getY() + 1.5, te.getPos().getZ() + 0.75);
-		GlStateManager.rotate(90, 0, 1, 0);
-		for (BakedQuad bakedQuad : ClientUtils.createQuads(te.voxels, 1000000))
+		GlStateManager.translate(te.getPos().getX(), te.getPos().getY() + 1.5f, te.getPos().getZ() + 0.25);
+		if (!quadCache.containsKey(te) || !te.useCachedModel)
+		{
+			quadCache.put(te, ClientUtils.createQuads(te.voxels, 1024));
+			te.useCachedModel = true;
+		}
+
+		for (BakedQuad bakedQuad : quadCache.get(te))
 		{
 			int[] data = bakedQuad.getVertexData();
 			bufferbuilder.addVertexData(data);
@@ -131,6 +137,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		bufferbuilder.pos(creatorBox.maxX, creatorBox.maxY, creatorBox.maxZ).color(0.0f, 0.0f, 0.75f, 0.75f).endVertex();
 		bufferbuilder.pos(holobox.maxX, holobox.minY, holobox.maxZ).color(0.0f, 0.0f, 0.75f, 0.75f).endVertex();
 		tessellator.draw();
+
 		bufferbuilder.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
 		bufferbuilder.pos(creatorBox.minX, creatorBox.maxY, creatorBox.minZ).color(0.0f, 0.0f, 0.75f, 0.75f).endVertex();
 		bufferbuilder.pos(holobox.minX, holobox.minY, holobox.minZ).color(0.0f, 0.0f, 0.75f, 0.75f).endVertex();

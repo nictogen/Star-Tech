@@ -25,9 +25,7 @@ public class PrinterRenderer extends TileEntitySpecialRenderer<BlockPrinter.Tile
 		if (!te.gun.isEmpty())
 		{
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 0.45, 0.5);
-			GlStateManager.rotate(90f, 0.0f, 1.0f, 0.0f);
-			GlStateManager.translate(0, 0, 0.5);
+			GlStateManager.translate(0.15, 0.45, 0.75);
 			Minecraft.getMinecraft().getRenderItem().renderItem(te.gun, ItemCameraTransforms.TransformType.GROUND);
 			GlStateManager.popMatrix();
 		}

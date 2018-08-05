@@ -15,6 +15,7 @@ import java.awt.*;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Nictogen on 4/3/18.
@@ -70,17 +71,18 @@ public class ClientUtils
 		ArrayList<BakedQuad> quads = new ArrayList<>();
 		TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(VOXEL_TEXTURE_FOR_ATLAS.toString());
 		int size = 8;
-		for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vX = i % size, vY = (i % (size * size)) / size, vZ = i / (size * size))
+		Random r = new Random(123123213L);
+		for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vZ = i % size, vY = (i % (size * size)) / size, vX = i / (size * size))
 		{
 			int tintIndex = voxels[i] != 4 ? voxels[i] : (ammo-- > 0) ? 4 : 5;
-
+			float randDarkness = r.nextFloat() / 10;
 			if (voxels[i] != 0)
 			{
 				for (EnumFacing facing : EnumFacing.values())
 				{
 					if (getByteInDirection(facing, i, voxels, size, size, size) == 0)
 					{
-						float brightness = getFaceBrightness(facing);
+						float brightness = getFaceBrightness(facing) - randDarkness;
 						AxisAlignedBB bb = voxel.offset(vX * 0.0625, vY * 0.0625, vZ * 0.0625);
 						addQuad(quads, bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, new Color(brightness, brightness, brightness), tintIndex, facing,
 								sprite);

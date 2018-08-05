@@ -58,6 +58,7 @@ public class BlockBlueprintCreator extends Block
 	{
 		public byte[] voxels = new byte[1024];
 		public int buttonDown = 0;
+		public boolean useCachedModel = false;
 
 		public TileEntityBlueprintCreator()
 		{
@@ -76,6 +77,7 @@ public class BlockBlueprintCreator extends Block
 			super.readFromNBT(compound);
 			voxels = compound.getByteArray("voxels");
 			buttonDown = compound.getInteger("buttonDown");
+			useCachedModel = false;
 		}
 
 		@Override public NBTTagCompound writeToNBT(NBTTagCompound compound)
