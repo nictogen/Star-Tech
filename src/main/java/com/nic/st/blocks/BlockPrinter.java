@@ -150,11 +150,16 @@ public class BlockPrinter extends Block
 
 		@Override public void update()
 		{
-			if (ticks == 0 && gun.isEmpty() && !blueprint.isEmpty() && getWorld().isBlockPowered(getPos()))
+			if (ticks == 0 && gun.isEmpty() && !blueprint.isEmpty() && blueprint.getItem() instanceof ItemBlueprint && getWorld().isBlockPowered(getPos()))
 			{
 				ticks++;
 				gun = new ItemStack(StarTech.Items.printedGun, 1);
-				ItemPrintedGun.createGunData(new byte[0], gun);
+				int[][] colors = new int[4][];
+				for (int i = 0; i < 4; i++)
+				{
+					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
+				}
+				ItemPrintedGun.createGunData(new byte[0], gun, colors);
 				IBlockState state = getWorld().getBlockState(getPos());
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
@@ -170,7 +175,12 @@ public class BlockPrinter extends Block
 					if (blueprintArray[i] != 0)
 						n++;
 				}
-				ItemPrintedGun.createGunData(newArray, gun);
+				int[][] colors = new int[4][];
+				for (int i = 0; i < 4; i++)
+				{
+					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
+				}
+				ItemPrintedGun.createGunData(newArray, gun, colors);
 				IBlockState state = getWorld().getBlockState(getPos());
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
@@ -184,10 +194,15 @@ public class BlockPrinter extends Block
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
 			}
-			if (!blueprint.isEmpty() && ticks > blueprint.getTagCompound().getInteger("total") * 200)
+			if (!blueprint.isEmpty() && blueprint.getItem() instanceof ItemBlueprint && ticks > blueprint.getTagCompound().getInteger("total") * 200)
 			{
 				ticks = 0;
-				ItemPrintedGun.createGunData(blueprint.getTagCompound().getByteArray("voxels"), gun);
+				int[][] colors = new int[4][];
+				for (int i = 0; i < 4; i++)
+				{
+					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
+				}
+				ItemPrintedGun.createGunData(blueprint.getTagCompound().getByteArray("voxels"), gun, colors);
 				IBlockState state = getWorld().getBlockState(getPos());
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);

@@ -7,6 +7,7 @@ import com.nic.st.util.Utils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
@@ -78,14 +79,20 @@ public class StarTechEventHandler
 	{
 		if (!(event.getEntity().world.getBlockState(event.getPos()).getBlock() instanceof BlockHologram))
 			return;
+		TileEntity te = event.getWorld().getTileEntity(event.getPos().down());
 
-		if (event.getHand() == EnumHand.MAIN_HAND && event.getEntityPlayer().isSneaking() && event.getWorld()
-				.getTileEntity(event.getPos().down()) instanceof BlockBlueprintCreator.TileEntityBlueprintCreator)
+		if (event.getHand() == EnumHand.MAIN_HAND && event.getEntityPlayer().isSneaking() && te instanceof BlockBlueprintCreator.TileEntityBlueprintCreator)
 		{
 			ItemStack stack = new ItemStack(StarTech.Items.blueprint);
 			NBTTagCompound compound = new NBTTagCompound();
-			compound.setByteArray("voxels",
-					((BlockBlueprintCreator.TileEntityBlueprintCreator) event.getWorld().getTileEntity(event.getPos().down())).voxels.clone());
+			compound.setByteArray("voxels", ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).voxels.clone());
+			for (int i = 0; i < 4; i++)
+			{
+				compound.setIntArray("color" + i, new int[] { ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getRed(),
+						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getGreen(),
+						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getBlue(),
+						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getAlpha() });
+			}
 			int total = 0;
 			for (byte voxels : compound.getByteArray("voxels"))
 			{

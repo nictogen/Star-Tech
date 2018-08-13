@@ -44,7 +44,7 @@ public class ItemPrintedGun extends Item
 		return stack.getTagCompound();
 	}
 
-	public static NBTTagCompound createGunData(byte[] voxels, ItemStack stack)
+	public static NBTTagCompound createGunData(byte[] voxels, ItemStack stack, int[][] colors)
 	{
 		NBTTagCompound nbt = getGunData(stack);
 
@@ -83,6 +83,10 @@ public class ItemPrintedGun extends Item
 		nbt.setInteger("max_ammo", blue * 250);
 		nbt.setInteger("ammo", blue * 250);
 		nbt.setDouble("damage", darkGrey / lightGrey);
+		for (int i = 0; i < 4; i++)
+		{
+			nbt.setIntArray("color" + i, colors[i]);
+		}
 		return nbt;
 	}
 

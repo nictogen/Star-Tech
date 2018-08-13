@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
@@ -61,10 +62,18 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		GlStateManager.translate(te.getPos().getX() + 0.75, te.getPos().getY() + 0.2, te.getPos().getZ() - 0.3);
 		GlStateManager.rotate(20f, 1, 0, 0);
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 0 ? pushedButtonBox : buttonBox).offset(-0.3, 0, 0), 1.0f, 0.85f, 0.0f, 1.0f);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 1 ? pushedButtonBox : buttonBox).offset(-0.2, 0, 0), 0.5f, 0.5f, 0.5f, 1.0f);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 2 ? pushedButtonBox : buttonBox).offset(-0.1, 0, 0), 0.3f, 0.3f, 0.3f, 1.0f);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 3 ? pushedButtonBox : buttonBox), 0.2f, 0.4f, 1.0f, 1.0f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 3 ? pushedButtonBox : buttonBox), (float) te.colors[0].getRed() / 255f,
+				(float) te.colors[0].getGreen() / 255f, (float) te.colors[0].getBlue() / 255f, (float) te.colors[0].getAlpha() / 255f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 2 ? pushedButtonBox : buttonBox).offset(-0.1, 0, 0),
+				(float) te.colors[1].getRed() / 255f, (float) te.colors[1].getGreen() / 255f, (float) te.colors[1].getBlue() / 255f,
+				(float) te.colors[1].getAlpha() / 255f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 1 ? pushedButtonBox : buttonBox).offset(-0.2, 0, 0),
+				(float) te.colors[2].getRed() / 255f, (float) te.colors[2].getGreen() / 255f, (float) te.colors[2].getBlue() / 255f,
+				(float) te.colors[2].getAlpha() / 255f);
+		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 0 ? pushedButtonBox : buttonBox).offset(-0.3, 0, 0),
+				(float) te.colors[3].getRed() / 255f, (float) te.colors[3].getGreen() / 255f, (float) te.colors[3].getBlue() / 255f,
+				(float) te.colors[3].getAlpha() / 255f);
+
 		tessellator.draw();
 		GlStateManager.popMatrix();
 
@@ -83,7 +92,15 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		{
 			int[] data = bakedQuad.getVertexData();
 			bufferbuilder.addVertexData(data);
-			int color = Minecraft.getMinecraft().getItemColors().colorMultiplier(new ItemStack(StarTech.Items.printedGun), bakedQuad.getTintIndex());
+			NBTTagCompound colorCompound = new NBTTagCompound();
+			for (int i = 0; i < 4; i++)
+			{
+				colorCompound.setIntArray("color" + i,
+						new int[] { te.colors[i].getRed(), te.colors[i].getGreen(), te.colors[i].getBlue(), te.colors[i].getAlpha() });
+			}
+			ItemStack gun = new ItemStack(StarTech.Items.printedGun);
+			gun.setTagCompound(colorCompound);
+			int color = Minecraft.getMinecraft().getItemColors().colorMultiplier(gun, bakedQuad.getTintIndex());
 
 			float cb = color & 0xFF;
 			float cg = (color >>> 8) & 0xFF;

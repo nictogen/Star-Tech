@@ -7,6 +7,7 @@ import com.nic.st.client.BlueprintCreatorRenderer;
 import com.nic.st.client.BulletRenderer;
 import com.nic.st.client.PrintedGunModel;
 import com.nic.st.client.PrinterRenderer;
+import com.nic.st.client.gui.GuiEditCreatorButton;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.power.EntityPowerRocket;
@@ -16,6 +17,7 @@ import com.nic.st.util.ClientUtils;
 import com.nic.st.util.LimbManipulationUtil;
 import lucraft.mods.lucraftcore.infinity.render.ItemRendererInfinityStone;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
@@ -27,7 +29,9 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -36,6 +40,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -203,5 +208,43 @@ public class ClientProxy extends CommonProxy
 	public void onTextureStitch(TextureStitchEvent.Pre event)
 	{
 		event.getMap().registerSprite(ClientUtils.VOXEL_TEXTURE_FOR_ATLAS);
+	}
+
+	@SubscribeEvent
+	public void onRightClick(PlayerInteractEvent.RightClickBlock event)
+	{
+		if (event.getEntity().world.getBlockState(event.getPos()).getBlock() instanceof BlockBlueprintCreator)
+		{
+			BlockBlueprintCreator.TileEntityBlueprintCreator te = (BlockBlueprintCreator.TileEntityBlueprintCreator) event.getEntity().world
+					.getTileEntity(event.getPos());
+			AxisAlignedBB buttonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.85, 0.1).offset(te.getPos());
+			Vec3d hitVec = event.getEntityPlayer().getPositionEyes(0.0f);
+			Vec3d lookPos = event.getEntityPlayer().getLook(0.0f);
+			hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
+
+			if (buttonBox.offset(0.45, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			{
+				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 3));
+			}
+			//		else if (buttonBox.offset(0.55, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			//		{
+			//			te.buttonDown = 1;
+			//		}
+			//		else if (buttonBox.offset(0.65, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			//		{
+			//			te.buttonDown = 2;
+			//		}
+			//		else if (buttonBox.offset(0.75, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			//		{
+			//			te.buttonDown = 3;
+			//		}
+			//		else
+			//			return;
+			event.setCanceled(true);
+			te.markDirty();
+			IBlockState state = te.getWorld().getBlockState(te.getPos());
+			te.getWorld().notifyBlockUpdate(te.getPos(), state, state, 3);
+		}
+
 	}
 }

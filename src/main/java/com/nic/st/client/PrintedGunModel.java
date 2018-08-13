@@ -164,15 +164,8 @@ public class PrintedGunModel implements IBakedModel
 
 		@Override public int colorMultiplier(ItemStack stack, int tintIndex)
 		{
-			Color color = (tintIndex == 1) ? new Color(1.0f, 0.85f, 0.0f) :
-					(tintIndex == 2) ?
-							new Color(0.5f, 0.5f, 0.5f) :
-							(tintIndex == 3) ?
-									new Color(0.3f, 0.3f, 0.3f) :
-									(tintIndex == 4) ?
-											new Color(0.2f, 0.4f, 1.0f) : new Color(0.3f, 0.3f, 0.5f);
-
-			return color.getRGB();
+			int[] color = stack.hasTagCompound() ? stack.getTagCompound().getIntArray("color" + (tintIndex - 1)) : null;
+			return (color == null || color.length == 0 ? new Color(0, 0, 0) : new Color(color[0], color[1], color[2], color[3])).getRGB();
 		}
 	}
 

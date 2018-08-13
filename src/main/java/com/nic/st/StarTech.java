@@ -6,6 +6,7 @@ import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
+import com.nic.st.network.MessageChangeColor;
 import com.nic.st.power.EntityPowerRocket;
 import com.nic.st.power.ItemPowerStone;
 import net.minecraft.block.Block;
@@ -22,9 +23,12 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -44,6 +48,7 @@ public class StarTech
 	@SidedProxy(clientSide = "com.nic.st.ClientProxy", serverSide = "com.nic.st.CommonProxy")
 	public static CommonProxy proxy;
 
+	public static SimpleNetworkWrapper simpleNetworkWrapper;
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event)
 	{
@@ -92,6 +97,9 @@ public class StarTech
 	{
 		proxy.preInit(event);
 		MinecraftForge.EVENT_BUS.register(proxy);
+
+		simpleNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+		simpleNetworkWrapper.registerMessage(MessageChangeColor.Handler.class, MessageChangeColor.class, 0, Side.SERVER);
 	}
 
 	@EventHandler

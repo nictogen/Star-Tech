@@ -14,6 +14,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 
 import static com.nic.st.blocks.BlockHologram.HOLO_BOX;
 
@@ -31,6 +32,7 @@ public class BlockBlueprintCreator extends Block
 		setHardness(2.0f).setResistance(10.0f);
 		setCreativeTab(CreativeTabs.REDSTONE);
 	}
+
 	public boolean hasTileEntity(IBlockState state)
 	{
 		return true;
@@ -57,6 +59,12 @@ public class BlockBlueprintCreator extends Block
 	public static class TileEntityBlueprintCreator extends TileEntity implements ITickable
 	{
 		public byte[] voxels = new byte[1024];
+		public Color[] colors = new Color[] {
+				new Color(0.2f, 0.4f, 1.0f, 1.0f),
+				new Color(0.5f, 0.5f, 0.5f, 1.0f),
+				new Color(1.0f, 0.85f, 0.0f, 1.0f),
+				new Color(0.3f, 0.3f, 0.3f, 1.0f)
+		};
 		public int buttonDown = 0;
 		public boolean useCachedModel = false;
 
@@ -77,6 +85,12 @@ public class BlockBlueprintCreator extends Block
 			super.readFromNBT(compound);
 			voxels = compound.getByteArray("voxels");
 			buttonDown = compound.getInteger("buttonDown");
+			for (int i = 0; i < 4; i++)
+			{
+				int[] rgba = compound.getIntArray("color" + i);
+				if (rgba.length > 3)
+					colors[i] = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
+			}
 			useCachedModel = false;
 		}
 
@@ -85,6 +99,11 @@ public class BlockBlueprintCreator extends Block
 			NBTTagCompound nbt = super.writeToNBT(compound);
 			nbt.setByteArray("voxels", voxels);
 			nbt.setInteger("buttonDown", buttonDown);
+			buttonDown = compound.getInteger("buttonDown");
+			for (int i = 0; i < 4; i++)
+			{
+				compound.setIntArray("color" + i, new int[] { colors[i].getRed(), colors[i].getGreen(), colors[i].getBlue(), colors[i].getAlpha() });
+			}
 			return nbt;
 		}
 
