@@ -42,19 +42,19 @@ public class StarTechEventHandler
 
 			if (buttonBox.offset(0.45, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
-				te.buttonDown = 0;
+				te.buttonDown = 3;
 			}
 			else if (buttonBox.offset(0.55, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
-				te.buttonDown = 1;
+				te.buttonDown = 2;
 			}
 			else if (buttonBox.offset(0.65, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
-				te.buttonDown = 2;
+				te.buttonDown = 1;
 			}
 			else if (buttonBox.offset(0.75, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
-				te.buttonDown = 3;
+				te.buttonDown = 0;
 			}
 			else
 				return;
