@@ -1,6 +1,8 @@
 package com.nic.st.power;
 
 import com.nic.st.util.ClientUtils;
+import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
+import lucraft.mods.lucraftcore.superpowers.items.IItemAbilityContainer;
 import lucraft.mods.lucraftcore.util.helper.LCRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelPlayer;
@@ -41,10 +43,21 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			float headPitch, float scale)
 	{
 		renderCracking(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-		if (ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.MAIN_HAND) > 0)
-			renderBeams(entitylivingbaseIn, EnumHand.MAIN_HAND, ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.MAIN_HAND));
-		if (ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.OFF_HAND) > 0)
-			renderBeams(entitylivingbaseIn, EnumHand.OFF_HAND, ItemPowerStone.getPowerStoneUseDuration(entitylivingbaseIn, EnumHand.OFF_HAND));
+		if(entitylivingbaseIn.getHeldItemMainhand().getItem() instanceof IItemAbilityContainer){
+			for (Ability ability : IItemAbilityContainer.getAbilities(entitylivingbaseIn, entitylivingbaseIn.getHeldItemMainhand()))
+			{
+				if(ability instanceof AbilityTendrils && ability.isEnabled())
+					renderBeams(entitylivingbaseIn, EnumHand.MAIN_HAND, ability.getTicks());
+			}
+		}
+
+		if(entitylivingbaseIn.getHeldItemOffhand().getItem() instanceof IItemAbilityContainer){
+			for (Ability ability : IItemAbilityContainer.getAbilities(entitylivingbaseIn, entitylivingbaseIn.getHeldItemOffhand()))
+			{
+				if(ability instanceof AbilityTendrils && ability.isEnabled())
+					renderBeams(entitylivingbaseIn, EnumHand.OFF_HAND, ability.getTicks());
+			}
+		}
 	}
 
 	private void renderCracking(EntityPlayer entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,

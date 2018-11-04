@@ -7,8 +7,10 @@ import com.nic.st.entity.EntityBullet;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.network.MessageChangeColor;
+import com.nic.st.power.AbilityTendrils;
 import com.nic.st.power.EntityPowerRocket;
 import com.nic.st.power.ItemPowerStone;
+import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -68,6 +70,13 @@ public class StarTech
 						.tracker(80, 10, true)
 						.build());
 	}
+
+
+	@SubscribeEvent
+	public static void onRegisterAbilities(RegistryEvent.Register<Ability.AbilityEntry> e) {
+		e.getRegistry().register(new Ability.AbilityEntry(AbilityTendrils.class, new ResourceLocation(MODID, "tendrils")));
+	}
+
 
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) throws IllegalAccessException

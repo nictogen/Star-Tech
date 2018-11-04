@@ -58,7 +58,6 @@ public class PrintedGunModel implements IBakedModel
 		GlStateManager.disableLighting(); //This is really shitty to do but for some reason it's dark as hell without it? TODO figure it out
 		GlStateManager.disableCull(); //Same thing ^
 		return quads;
-
 	}
 
 	@Override public boolean isAmbientOcclusion()

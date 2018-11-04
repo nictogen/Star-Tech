@@ -29,8 +29,9 @@ minecraft {
 repositories {
     maven { url "https://jitpack.io" }
 }
+
 dependencies {
-    deobfCompile ('com.gitlab.lcoremodders:LucraftCore:7f0945b427') {
+    deobfCompile ('com.gitlab.lcoremodders:LucraftCore:8c0a6d7e') {
         exclude group: 'slimeknights.mantle'
         exclude group: 'slimeknights'
         exclude group: 'cofh'
