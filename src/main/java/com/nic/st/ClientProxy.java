@@ -23,15 +23,18 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -130,6 +133,26 @@ public class ClientProxy extends CommonProxy
 		ClientRegistry.bindTileEntitySpecialRenderer(BlockPrinter.TileEntityPrinter.class, new PrinterRenderer());
 	}
 
+	@Override public void onLaserImpact(World world, double x, double y, double z, Color c)
+	{
+		BulletRenderer.Overlay particlefirework$overlay = new BulletRenderer.Overlay(world, x, y, z);
+		particlefirework$overlay.setRBGColorF(((float) c.getRed())/255f, ((float) c.getGreen())/255f, ((float) c.getBlue())/255f);
+		Minecraft.getMinecraft().effectRenderer.addEffect(particlefirework$overlay);
+
+		for (int i = 0; i < 5; i++)
+		{
+			Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.SMOKE_NORMAL.getParticleID(), x + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), y + world.rand.nextFloat() * 0.2, z + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), world.rand.nextGaussian()*0.05, 0.05, world.rand.nextGaussian()*0.05);
+			Particle p = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.FIREWORKS_SPARK.getParticleID(), x + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), y + world.rand.nextFloat() * 0.2, z + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), world.rand.nextGaussian()*0.05, 0.1, world.rand.nextGaussian()*0.05);
+
+			if (p != null)
+			{
+				p.setRBGColorF(1.0f,  1.0f, 1.0f);
+				p.multipleParticleScaleBy(0.2f);
+			}
+		}
+
+	}
+
 	@SubscribeEvent public void registerModels(ModelRegistryEvent ev)
 	{
 		for (Field f : StarTech.Items.class.getDeclaredFields())
@@ -220,26 +243,26 @@ public class ClientProxy extends CommonProxy
 			AxisAlignedBB buttonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.85, 0.1).offset(te.getPos());
 			Vec3d hitVec = event.getEntityPlayer().getPositionEyes(0.0f);
 			Vec3d lookPos = event.getEntityPlayer().getLook(0.0f);
-			hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
+			hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
 			if (buttonBox.offset(0.45, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
 				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 3));
 			}
-			//		else if (buttonBox.offset(0.55, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			//		{
-			//			te.buttonDown = 1;
-			//		}
-			//		else if (buttonBox.offset(0.65, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			//		{
-			//			te.buttonDown = 2;
-			//		}
-			//		else if (buttonBox.offset(0.75, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			//		{
-			//			te.buttonDown = 3;
-			//		}
-			//		else
-			//			return;
+			else if (buttonBox.offset(0.55, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			{
+				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 2));
+			}
+			else if (buttonBox.offset(0.65, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			{
+				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 1));
+			}
+			else if (buttonBox.offset(0.75, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			{
+				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 0));
+			}
+			else
+				return;
 			event.setCanceled(true);
 			te.markDirty();
 			IBlockState state = te.getWorld().getBlockState(te.getPos());

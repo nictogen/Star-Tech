@@ -29,7 +29,7 @@ public class Utils
 
 		Vec3d hitVec = player.getPositionEyes(0.0f);
 		Vec3d lookPos = player.getLook(0.0f);
-		hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
+		hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
 		for (BlockBlueprintCreator.TileEntityBlueprintCreator creator : creators)
 		{
@@ -63,7 +63,7 @@ public class Utils
 
 		Vec3d hitVec = player.getPositionEyes(0.0f);
 		Vec3d lookPos = player.getLook(0.0f);
-		hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
+		hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
 		for (BlockBlueprintCreator.TileEntityBlueprintCreator creator : creators)
 		{

@@ -11,7 +11,7 @@ public class ItemBlueprint extends Item
 	public ItemBlueprint()
 	{
 		setRegistryName(StarTech.MODID, "blueprint");
-		setUnlocalizedName("blueprint");
+		setTranslationKey("blueprint");
 		setMaxStackSize(1);
 	}
 

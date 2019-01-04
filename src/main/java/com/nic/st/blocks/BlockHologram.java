@@ -33,7 +33,7 @@ public class BlockHologram extends Block
 	{
 		super(HOLOGRAM);
 		setRegistryName("star-tech:hologram");
-		setUnlocalizedName("hologram");
+		setTranslationKey("hologram");
 		setBlockUnbreakable();
 	}
 

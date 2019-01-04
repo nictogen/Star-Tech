@@ -145,7 +145,7 @@ public class PrintedGunModel implements IBakedModel
 	{
 		@Override public boolean accepts(ResourceLocation modelLocation)
 		{
-			return modelLocation.getResourcePath().contains("printed_gun");
+			return modelLocation.getPath().contains("printed_gun");
 		}
 
 		@Override public IModel loadModel(ResourceLocation modelLocation)

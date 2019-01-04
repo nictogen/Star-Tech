@@ -2,9 +2,11 @@ package com.nic.st.client.gui;
 
 import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
-import com.nic.st.network.MessageChangeColor;
+import com.nic.st.items.ItemPrintedGun;
+import com.nic.st.network.MessageChangeVoxel;
 import lucraft.mods.lucraftcore.util.container.ContainerDummy;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,6 +26,9 @@ public class GuiEditCreatorButton extends GuiContainer
 
 	private GuiTextField red, blue, green;
 
+	private GuiButton usage;
+	private int usageIndex;
+
 	private BlockPos pos;
 	private int button;
 
@@ -41,21 +46,26 @@ public class GuiEditCreatorButton extends GuiContainer
 
 		red = new GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 0, 0, 26, 14);
 		red.setMaxStringLength(3);
+		red.setText("0");
 
-		green = new GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 0, 0, 26, 14);
+		green = new GuiTextField(1, Minecraft.getMinecraft().fontRenderer, 0, 0, 26, 14);
 		green.setMaxStringLength(3);
-		green.setText("255");
+		green.setText("0");
 
-		blue = new GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 0, 0, 26, 14);
+		blue = new GuiTextField(2, Minecraft.getMinecraft().fontRenderer, 0, 0, 26, 14);
 		blue.setMaxStringLength(3);
-		blue.setText("255");
+		blue.setText("0");
 
+		usage = addButton(new GuiButton(3, 0, 0, ""));
 		if (te instanceof BlockBlueprintCreator.TileEntityBlueprintCreator)
 		{
 			red.setText(((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[button].getRed() + "");
 			green.setText(((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[button].getGreen() + "");
 			blue.setText(((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[button].getBlue() + "");
+			usage.displayString = ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses[button].name;
 		}
+
+
 	}
 
 	@Override public void initGui()
@@ -71,25 +81,28 @@ public class GuiEditCreatorButton extends GuiContainer
 		int i = (this.width - this.xSize) / 2;
 		int j = (this.height - this.ySize) / 2;
 
-		red.x = i - 30;
-		red.y = j + 75;
+		red.x = i + 43;
+		red.y = j + 70;
 		red.drawTextBox();
 		this.drawCenteredString(mc.fontRenderer, "Red", red.x + 13, red.y - 10, Color.RED.getRGB());
 
-		green.x = i;
-		green.y = j + 75;
+		green.x = i + 73;
+		green.y = j + 70;
 		green.drawTextBox();
 		this.drawCenteredString(mc.fontRenderer, "Green", green.x + 13, green.y - 10, Color.GREEN.getRGB());
 
-		blue.x = i + 30;
-		blue.y = j + 75;
+		blue.x = i + 103;
+		blue.y = j + 70;
 		blue.drawTextBox();
 		this.drawCenteredString(mc.fontRenderer, "Blue", blue.x + 12, blue.y - 10, Color.BLUE.getRGB());
 
+		usage.x = i - 10;
+		usage.y = j + 95;
+		usage.drawButton(mc, mouseX, mouseY, mc.getRenderPartialTicks());
+
 		GlStateManager.disableTexture2D();
-		GlStateManager.color((float) Integer.parseInt(red.getText()) / 255f, (float) Integer.parseInt(green.getText()) / 255f,
-				(float) Integer.parseInt(blue.getText()) / 255f);
-		this.drawTexturedModalRect(i - 30, j + 90, 0, 0, 86, 5);
+		GlStateManager.color((float) Integer.parseInt(red.getText()) / 255f, (float) Integer.parseInt(green.getText()) / 255f, (float) Integer.parseInt(blue.getText()) / 255f);
+		this.drawTexturedModalRect(i - 10, j + 90, 0, 0, 200, 5);
 		GlStateManager.enableTexture2D();
 	}
 
@@ -102,6 +115,24 @@ public class GuiEditCreatorButton extends GuiContainer
 			blue.mouseClicked(mouseX, mouseY, mouseButton);
 		if (green != null)
 			green.mouseClicked(mouseX, mouseY, mouseButton);
+		if(mouseButton == 0 && usage.isMouseOver()){
+			actionPerformed(usage);
+		}
+	}
+
+	@Override protected void actionPerformed(GuiButton button) throws IOException
+	{
+		super.actionPerformed(button);
+		if(button == usage){
+			usageIndex++;
+			if(usageIndex >= ItemPrintedGun.VoxelUses.values().length)
+				usageIndex = 0;
+			button.displayString = ItemPrintedGun.VoxelUses.values()[usageIndex].name;
+			StarTech.simpleNetworkWrapper.sendToServer(
+					new MessageChangeVoxel(new Color(Integer.parseInt(red.getText()), Integer.parseInt(green.getText()), Integer.parseInt(blue.getText())),
+							usageIndex, pos,
+							this.button));
+		}
 	}
 
 	@Override protected void keyTyped(char typedChar, int keyCode) throws IOException
@@ -134,7 +165,8 @@ public class GuiEditCreatorButton extends GuiContainer
 				box.setText("0");
 
 			StarTech.simpleNetworkWrapper.sendToServer(
-					new MessageChangeColor(new Color(Integer.parseInt(red.getText()), Integer.parseInt(green.getText()), Integer.parseInt(box.getText())), pos,
+					new MessageChangeVoxel(new Color(Integer.parseInt(red.getText()), Integer.parseInt(green.getText()), Integer.parseInt(blue.getText())),
+							usageIndex, pos,
 							button));
 		}
 	}

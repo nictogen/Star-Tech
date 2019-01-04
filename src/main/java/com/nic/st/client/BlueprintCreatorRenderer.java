@@ -43,7 +43,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 
 		Vec3d hitVec = mc.player.getPositionEyes(partialTicks);
 		Vec3d lookPos = mc.player.getLook(partialTicks);
-		hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
+		hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 		int lookVoxel = Utils.getVoxel(BlockHologram.HOLO_BOX.offset(te.getPos()), mc.player.getPositionEyes(partialTicks), hitVec, te.voxels, te.getPos());
 
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);

@@ -1,6 +1,7 @@
 package com.nic.st.blocks;
 
 import com.nic.st.StarTech;
+import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -28,7 +29,7 @@ public class BlockBlueprintCreator extends Block
 	{
 		super(Material.IRON);
 		setRegistryName(StarTech.MODID, "blueprint_creator");
-		setUnlocalizedName("blueprint_creator");
+		setTranslationKey("blueprint_creator");
 		setHardness(2.0f).setResistance(10.0f);
 		setCreativeTab(CreativeTabs.REDSTONE);
 	}
@@ -58,12 +59,19 @@ public class BlockBlueprintCreator extends Block
 
 	public static class TileEntityBlueprintCreator extends TileEntity implements ITickable
 	{
+		public static final int VOXEL_TYPES = 4;
 		public byte[] voxels = new byte[1024];
 		public Color[] colors = new Color[] {
 				new Color(0.2f, 0.4f, 1.0f, 1.0f),
 				new Color(0.5f, 0.5f, 0.5f, 1.0f),
 				new Color(1.0f, 0.85f, 0.0f, 1.0f),
 				new Color(0.3f, 0.3f, 0.3f, 1.0f)
+		};
+		public ItemPrintedGun.VoxelUses[] uses = new ItemPrintedGun.VoxelUses[] {
+				ItemPrintedGun.VoxelUses.STRUCTURE,
+				ItemPrintedGun.VoxelUses.STRUCTURE,
+				ItemPrintedGun.VoxelUses.STRUCTURE,
+				ItemPrintedGun.VoxelUses.STRUCTURE
 		};
 		public int buttonDown = 0;
 		public boolean useCachedModel = false;
@@ -85,11 +93,15 @@ public class BlockBlueprintCreator extends Block
 			super.readFromNBT(compound);
 			voxels = compound.getByteArray("voxels");
 			buttonDown = compound.getInteger("buttonDown");
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < VOXEL_TYPES; i++)
 			{
 				int[] rgba = compound.getIntArray("color" + i);
 				if (rgba.length > 3)
 					colors[i] = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
+			}
+			for (int i = 0; i < VOXEL_TYPES; i++)
+			{
+				uses[i] = ItemPrintedGun.VoxelUses.values()[compound.getInteger("voxelUse" + i)];
 			}
 			useCachedModel = false;
 		}
@@ -100,9 +112,13 @@ public class BlockBlueprintCreator extends Block
 			nbt.setByteArray("voxels", voxels);
 			nbt.setInteger("buttonDown", buttonDown);
 			buttonDown = compound.getInteger("buttonDown");
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < VOXEL_TYPES; i++)
 			{
 				compound.setIntArray("color" + i, new int[] { colors[i].getRed(), colors[i].getGreen(), colors[i].getBlue(), colors[i].getAlpha() });
+			}
+			for (int i = 0; i < VOXEL_TYPES; i++)
+			{
+				compound.setInteger("voxelUse" + i, uses[i].ordinal());
 			}
 			return nbt;
 		}

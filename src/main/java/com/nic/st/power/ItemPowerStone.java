@@ -27,7 +27,7 @@ public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityCon
 	public ItemPowerStone()
 	{
 		setRegistryName(StarTech.MODID, "power_stone");
-		setUnlocalizedName("power_stone");
+		setTranslationKey("power_stone");
 		setMaxStackSize(1);
 	}
 

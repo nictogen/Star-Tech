@@ -6,7 +6,7 @@ import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
-import com.nic.st.network.MessageChangeColor;
+import com.nic.st.network.MessageChangeVoxel;
 import com.nic.st.power.AbilityTendrils;
 import com.nic.st.power.EntityPowerRocket;
 import com.nic.st.power.ItemPowerStone;
@@ -88,7 +88,7 @@ public class StarTech
 		for (Field field : Blocks.class.getDeclaredFields())
 		{
 			Block block = (Block) field.get(null);
-			Item itemBlock = new ItemBlock(block).setRegistryName(block.getRegistryName()).setUnlocalizedName(block.getUnlocalizedName());
+			Item itemBlock = new ItemBlock(block).setRegistryName(block.getRegistryName()).setTranslationKey(block.getTranslationKey());
 			event.getRegistry().register(itemBlock);
 		}
 
@@ -108,7 +108,7 @@ public class StarTech
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		simpleNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
-		simpleNetworkWrapper.registerMessage(MessageChangeColor.Handler.class, MessageChangeColor.class, 0, Side.SERVER);
+		simpleNetworkWrapper.registerMessage(MessageChangeVoxel.Handler.class, MessageChangeVoxel.class, 0, Side.SERVER);
 	}
 
 	@EventHandler

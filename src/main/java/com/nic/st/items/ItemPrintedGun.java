@@ -24,7 +24,7 @@ public class ItemPrintedGun extends Item
 	public ItemPrintedGun()
 	{
 		setRegistryName(StarTech.MODID, "printed_gun");
-		setUnlocalizedName("printed_gun");
+		setTranslationKey("printed_gun");
 		setMaxStackSize(1);
 	}
 
@@ -44,50 +44,65 @@ public class ItemPrintedGun extends Item
 		return stack.getTagCompound();
 	}
 
-	public static NBTTagCompound createGunData(byte[] voxels, ItemStack stack, int[][] colors)
+	public static NBTTagCompound createGunData(byte[] voxels, ItemStack stack, int[][] colors, VoxelUses[] uses)
 	{
 		NBTTagCompound nbt = getGunData(stack);
 
-		int yellow = 0;
-		double darkGrey = 0;
-		double lightGrey = 0;
-		int blue = 0;
-
-		for (byte voxel : voxels)
-		{
-			switch (voxel)
-			{
-			case 0:
-				continue;
-			case 1:
-				yellow++;
-				continue;
-			case 2:
-				darkGrey++;
-				continue;
-			case 3:
-				lightGrey++;
-				continue;
-			case 4:
-				blue++;
-			}
-		}
-
-		if (yellow > 20)
-			yellow = 20;
-		if (blue > 20)
-			blue = 20;
+		GunStats stats = new GunStats(voxels, uses);
 
 		nbt.setByteArray("voxels", voxels);
-		nbt.setInteger("fire_freq", 40 - yellow * 2);
-		nbt.setInteger("max_ammo", blue * 250);
-		nbt.setInteger("ammo", blue * 250);
-		nbt.setDouble("damage", darkGrey / lightGrey);
+		nbt.setInteger("max_ammo", (int) (stats.ammo));
+		nbt.setInteger("ammo", (int) (stats.ammo));
+		nbt.setDouble("fire_freq", stats.fireRate);
+		nbt.setDouble("damage", stats.damage);
+
 		for (int i = 0; i < 4; i++)
-		{
 			nbt.setIntArray("color" + i, colors[i]);
-		}
+
 		return nbt;
+	}
+
+	public static class GunStats {
+		public int totalVoxels, structureVoxels, damageVoxels, ammoVoxels, fireRateVoxels;
+
+		public double damage, ammo, fireRate;
+
+		public GunStats(byte[] voxels, VoxelUses[] uses) {
+
+			for (byte voxel : voxels)
+			{
+				if (voxel > 0)
+				{
+					totalVoxels++;
+					switch (uses[voxel - 1])
+					{
+					case STRUCTURE:
+						structureVoxels++;
+						break;
+					case DAMAGE:
+						damageVoxels++;
+						break;
+					case AMMO:
+						ammoVoxels++;
+						break;
+					case FIRE_RATE:
+						fireRateVoxels++;
+						break;
+					}
+				}
+			}
+
+			damage = damageVoxels / totalVoxels;
+			ammo = ammoVoxels / totalVoxels;
+			fireRate = fireRateVoxels / totalVoxels;
+
+			//TODO
+		}
+
+		public boolean isValid() {
+			return structureVoxels >= totalVoxels / 4 && damageVoxels > 1 && ammoVoxels > 1 && fireRateVoxels > 1;
+		}
+
 	}
 
 	/**
@@ -203,5 +218,18 @@ public class ItemPrintedGun extends Item
 		}
 
 		return gunData.getInteger("ammo") > 0;
+	}
+
+	public enum VoxelUses
+	{
+		STRUCTURE("Structure"),
+		DAMAGE("Damage"),
+		AMMO("Ammo"),
+		FIRE_RATE("Fire Rate");
+		public String name;
+
+		VoxelUses(String name){
+			this.name = name;
+		}
 	}
 }

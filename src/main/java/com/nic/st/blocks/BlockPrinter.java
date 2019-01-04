@@ -37,7 +37,7 @@ public class BlockPrinter extends Block
 	{
 		super(Material.IRON);
 		setRegistryName(StarTech.MODID, "printer");
-		setUnlocalizedName("printer");
+		setTranslationKey("printer");
 		setHardness(2.0f).setResistance(10.0f);
 		setCreativeTab(CreativeTabs.REDSTONE);
 	}
@@ -154,12 +154,18 @@ public class BlockPrinter extends Block
 			{
 				ticks++;
 				gun = new ItemStack(StarTech.Items.printedGun, 1);
-				int[][] colors = new int[4][];
-				for (int i = 0; i < 4; i++)
+				int[][] colors = new int[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES][];
+				for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 				{
 					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
 				}
-				ItemPrintedGun.createGunData(new byte[0], gun, colors);
+
+				ItemPrintedGun.VoxelUses[] uses = new ItemPrintedGun.VoxelUses[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES];
+				for (int i = 0; i < uses.length; i++)
+				{
+					uses[i] = ItemPrintedGun.VoxelUses.values()[blueprint.getTagCompound().getIntArray("uses")[i]];
+				}
+				ItemPrintedGun.createGunData(new byte[0], gun, colors, uses);
 				IBlockState state = getWorld().getBlockState(getPos());
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
@@ -180,7 +186,12 @@ public class BlockPrinter extends Block
 				{
 					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
 				}
-				ItemPrintedGun.createGunData(newArray, gun, colors);
+				ItemPrintedGun.VoxelUses[] uses = new ItemPrintedGun.VoxelUses[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES];
+				for (int i = 0; i < uses.length; i++)
+				{
+					uses[i] = ItemPrintedGun.VoxelUses.values()[blueprint.getTagCompound().getIntArray("uses")[i]];
+				}
+				ItemPrintedGun.createGunData(newArray, gun, colors, uses);
 				IBlockState state = getWorld().getBlockState(getPos());
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);
@@ -202,7 +213,12 @@ public class BlockPrinter extends Block
 				{
 					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
 				}
-				ItemPrintedGun.createGunData(blueprint.getTagCompound().getByteArray("voxels"), gun, colors);
+				ItemPrintedGun.VoxelUses[] uses = new ItemPrintedGun.VoxelUses[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES];
+				for (int i = 0; i < uses.length; i++)
+				{
+					uses[i] = ItemPrintedGun.VoxelUses.values()[blueprint.getTagCompound().getIntArray("uses")[i]];
+				}
+				ItemPrintedGun.createGunData(blueprint.getTagCompound().getByteArray("voxels"), gun, colors, uses);
 				IBlockState state = getWorld().getBlockState(getPos());
 				markDirty();
 				getWorld().notifyBlockUpdate(getPos(), state, state, 3);

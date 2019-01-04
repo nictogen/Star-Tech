@@ -43,6 +43,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			float headPitch, float scale)
 	{
 		renderCracking(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+		
 		if(entitylivingbaseIn.getHeldItemMainhand().getItem() instanceof IItemAbilityContainer){
 			for (Ability ability : IItemAbilityContainer.getAbilities(entitylivingbaseIn, entitylivingbaseIn.getHeldItemMainhand()))
 			{

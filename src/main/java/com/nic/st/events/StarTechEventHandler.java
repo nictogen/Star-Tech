@@ -3,6 +3,7 @@ package com.nic.st.events;
 import com.nic.st.StarTech;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
+import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.util.Utils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -11,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,7 +40,7 @@ public class StarTechEventHandler
 			AxisAlignedBB buttonBox = new AxisAlignedBB(0.0, 0.75, 0, 0.1, 0.85, 0.1).offset(te.getPos());
 			Vec3d hitVec = event.getEntityPlayer().getPositionEyes(0.0f);
 			Vec3d lookPos = event.getEntityPlayer().getLook(0.0f);
-			hitVec = hitVec.addVector(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
+			hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
 			if (buttonBox.offset(0.45, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 			{
@@ -86,23 +88,31 @@ public class StarTechEventHandler
 			ItemStack stack = new ItemStack(StarTech.Items.blueprint);
 			NBTTagCompound compound = new NBTTagCompound();
 			compound.setByteArray("voxels", ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).voxels.clone());
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 			{
 				compound.setIntArray("color" + i, new int[] { ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getRed(),
 						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getGreen(),
 						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getBlue(),
 						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getAlpha() });
 			}
-			int total = 0;
-			for (byte voxels : compound.getByteArray("voxels"))
+			int[] uses = new int[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES];
+			for (int i = 0; i < uses.length; i++)
 			{
-				if (voxels != 0)
-					total++;
+				uses[i] = ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses[i].ordinal();
 			}
-			compound.setInteger("total", total);
-			stack.setTagCompound(compound);
+			compound.setIntArray("uses", uses);
 
-			event.getEntityPlayer().addItemStackToInventory(stack);
+			ItemPrintedGun.GunStats gunStats = new ItemPrintedGun.GunStats(((BlockBlueprintCreator.TileEntityBlueprintCreator) te).voxels, ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses);
+
+			compound.setInteger("total", gunStats.totalVoxels);
+
+			if(gunStats.isValid())
+			{
+				stack.setTagCompound(compound);
+				event.getEntityPlayer().addItemStackToInventory(stack);
+			} else {
+				event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("Structure voxels must make up at least 25% of your weapon."), true); //TODO translate
+			}
 		}
 		else if (event.getHand() == EnumHand.MAIN_HAND)
 		{
