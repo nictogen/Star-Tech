@@ -114,7 +114,8 @@ public class EntityBullet extends EntityThrowable
 	{
 		if (id == 3)
 		{
-			StarTech.proxy.onLaserImpact(world, posX, posY, posZ, Color.RED);
+			BlockPos c1 = dataManager.get(COLOR1);
+			StarTech.proxy.onLaserImpact(world, posX, posY, posZ, new Color(c1.getX(), c1.getY(), c1.getZ()));
 		}
 	}
 
