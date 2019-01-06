@@ -68,9 +68,19 @@ public class GuiEditCreatorButton extends GuiContainer
 
 	}
 
+
+
 	@Override public void initGui()
 	{
 		super.initGui();
+		TileEntity te = Minecraft.getMinecraft().world.getTileEntity(pos);
+
+		usage = addButton(new GuiButton(3, 0, 0, ""));
+		if (te instanceof BlockBlueprintCreator.TileEntityBlueprintCreator)
+		{
+			usage.displayString = ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses[button].name;
+		}
+
 	}
 
 	@Override protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
@@ -115,9 +125,6 @@ public class GuiEditCreatorButton extends GuiContainer
 			blue.mouseClicked(mouseX, mouseY, mouseButton);
 		if (green != null)
 			green.mouseClicked(mouseX, mouseY, mouseButton);
-		if(mouseButton == 0 && usage.isMouseOver()){
-			actionPerformed(usage);
-		}
 	}
 
 	@Override protected void actionPerformed(GuiButton button) throws IOException

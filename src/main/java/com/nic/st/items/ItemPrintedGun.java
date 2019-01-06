@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -53,21 +54,50 @@ public class ItemPrintedGun extends Item
 		nbt.setByteArray("voxels", voxels);
 		nbt.setInteger("max_ammo", (int) (stats.ammo));
 		nbt.setInteger("ammo", (int) (stats.ammo));
-		nbt.setDouble("fire_freq", stats.fireRate);
+		nbt.setInteger("fire_freq", (int) stats.fireRate);
+		nbt.setInteger("fireCount", (int) stats.fireRate);
 		nbt.setDouble("damage", stats.damage);
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < colors.length && i < uses.length; i++)
+		{
 			nbt.setIntArray("color" + i, colors[i]);
+			if(uses[i] == VoxelUses.DAMAGE){
+				nbt.setIntArray("damage_color", colors[i]);
+			} else if(uses[i] == VoxelUses.FIRE_RATE){
+				nbt.setIntArray("fire_rate_color", colors[i]);
+			}
+		}
+
+		if(nbt.getIntArray("fire_rate_color").length == 0)
+			nbt.setIntArray("fire_rate_color", nbt.getIntArray("damage_color"));
 
 		return nbt;
 	}
 
-	public static class GunStats {
-		public int totalVoxels, structureVoxels, damageVoxels, ammoVoxels, fireRateVoxels;
+	@Override public double getDurabilityForDisplay(ItemStack stack)
+	{
+		NBTTagCompound gunData = getGunData(stack);
+		return 1.0 - (double) gunData.getInteger("fireCount") / (double) gunData.getInteger("fire_freq");
+	}
+
+	@Override public boolean showDurabilityBar(ItemStack stack)
+	{
+		return getDurabilityForDisplay(stack) != 0.0;
+	}
+
+	@Override public boolean isDamaged(ItemStack stack)
+	{
+		return true;
+	}
+
+	public static class GunStats
+	{
+		public int totalVoxels = 1, structureVoxels, damageVoxels, ammoVoxels, fireRateVoxels;
 
 		public double damage, ammo, fireRate;
 
-		public GunStats(byte[] voxels, VoxelUses[] uses) {
+		public GunStats(byte[] voxels, VoxelUses[] uses)
+		{
 
 			for (byte voxel : voxels)
 			{
@@ -92,15 +122,15 @@ public class ItemPrintedGun extends Item
 				}
 			}
 
-			damage = damageVoxels / totalVoxels;
-			ammo = ammoVoxels / totalVoxels;
-			fireRate = fireRateVoxels / totalVoxels;
+			damage = 75*(((double) damageVoxels + 1.0) / (double) totalVoxels);
+			ammo = (((double) ammoVoxels + 1.0) / (double) totalVoxels) * 200;
+			fireRate = 5.0 / (((double) fireRateVoxels + 1.0) / (double) totalVoxels);
 
-			//TODO
 		}
 
-		public boolean isValid() {
-			return structureVoxels >= totalVoxels / 4 && damageVoxels > 1 && ammoVoxels > 1 && fireRateVoxels > 1;
+		public boolean isValid()
+		{
+			return structureVoxels >= totalVoxels / 4;
 		}
 
 	}
@@ -144,7 +174,7 @@ public class ItemPrintedGun extends Item
 			return new ActionResult<>(EnumActionResult.FAIL, itemstack);
 
 		gunData.setInteger("fireCount", 0);
-		gunData.setInteger("ammo", gunData.getInteger("ammo") - (int) (gunData.getDouble("damage") * 20.0));
+		gunData.setInteger("ammo", gunData.getInteger("ammo") - 1);
 		if (!worldIn.isRemote)
 		{
 			EnumHandSide side = (player.getPrimaryHand() == EnumHandSide.RIGHT) ?
@@ -156,9 +186,20 @@ public class ItemPrintedGun extends Item
 			Vec3d offset = eyes.add(rotVec.scale(0.3)).subtract(0, 0.1, 0);
 			EntityBullet entityBullet = new EntityBullet(worldIn, player);
 			entityBullet.damage = gunData.getDouble("damage");
+
+
+
 			entityBullet.setLocationAndAngles(offset.x, offset.y, offset.z, entityBullet.rotationYaw, entityBullet.rotationPitch);
 			entityBullet.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
 			worldIn.spawnEntity(entityBullet);
+
+			int[] color1 = gunData.getIntArray("damage_color");
+			int[] color2 = gunData.getIntArray("fire_rate_color");
+			if(color1.length > 2)
+				entityBullet.getDataManager().set(EntityBullet.COLOR1, new BlockPos(color1[0], color1[1], color1[2]));
+			if(color2.length > 2)
+				entityBullet.getDataManager().set(EntityBullet.COLOR2, new BlockPos(color2[0], color2[1], color2[2]));
+
 			worldIn.playSound(null, player.posX, player.posY, player.posZ, StarTech.Sounds.shoot, SoundCategory.PLAYERS, 1.0f, new Random().nextFloat());
 		}
 		return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
@@ -228,7 +269,8 @@ public class ItemPrintedGun extends Item
 		FIRE_RATE("Fire Rate");
 		public String name;
 
-		VoxelUses(String name){
+		VoxelUses(String name)
+		{
 			this.name = name;
 		}
 	}

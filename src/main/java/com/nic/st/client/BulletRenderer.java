@@ -15,9 +15,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 /**
  * Created by Nictogen on 4/3/18.
@@ -55,13 +58,12 @@ public class BulletRenderer extends RenderSnowball<EntityBullet>
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 
 
-//		for(float dZ = 0.0f; dZ > -5f; dZ--)
-//		{
-
 		float startingAngle = ((entity.ticksExisted + partialTicks)*30) % 360;
 
 		for(int i = 1; i > -1; i--)
 		{
+			BlockPos b = i == 1 ? entity.getDataManager().get(EntityBullet.COLOR1) : entity.getDataManager().get(EntityBullet.COLOR2);
+			Color color = new Color(b.getX(), b.getY(), b.getZ(), 255);
 			float dZ = 0f;
 			for (int angle = (int) startingAngle + 180*i; angle > startingAngle + 180*i - 720; angle -= 30)
 			{
@@ -71,7 +73,7 @@ public class BulletRenderer extends RenderSnowball<EntityBullet>
 				GlStateManager.translate(0.0f, -dZ*0.1, 0.0f);
 				GlStateManager.rotate(angle, 0.0f, 0.0f, -1.0f);
 				bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-				ClientUtils.addTexturedBoxVertices(bufferbuilder, voxel, 0.8f, 0.6f*i, 0.0f, 0.5f);
+				ClientUtils.addTexturedBoxVertices(bufferbuilder, voxel, ((float) color.getRed())/255f, ((float) color.getGreen())/255f, ((float) color.getBlue())/255f, 0.5f);
 				tessellator.draw();
 				GlStateManager.popMatrix();
 				dZ -= 0.05f;

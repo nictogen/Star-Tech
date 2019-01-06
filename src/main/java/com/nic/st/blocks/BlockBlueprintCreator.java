@@ -59,25 +59,23 @@ public class BlockBlueprintCreator extends Block
 
 	public static class TileEntityBlueprintCreator extends TileEntity implements ITickable
 	{
-		public static final int VOXEL_TYPES = 4;
+		public static final int VOXEL_TYPES = 7;
 		public byte[] voxels = new byte[1024];
-		public Color[] colors = new Color[] {
-				new Color(0.2f, 0.4f, 1.0f, 1.0f),
-				new Color(0.5f, 0.5f, 0.5f, 1.0f),
-				new Color(1.0f, 0.85f, 0.0f, 1.0f),
-				new Color(0.3f, 0.3f, 0.3f, 1.0f)
-		};
-		public ItemPrintedGun.VoxelUses[] uses = new ItemPrintedGun.VoxelUses[] {
-				ItemPrintedGun.VoxelUses.STRUCTURE,
-				ItemPrintedGun.VoxelUses.STRUCTURE,
-				ItemPrintedGun.VoxelUses.STRUCTURE,
-				ItemPrintedGun.VoxelUses.STRUCTURE
-		};
+		public Color[] colors;
+		public ItemPrintedGun.VoxelUses[] uses;
 		public int buttonDown = 0;
 		public boolean useCachedModel = false;
 
 		public TileEntityBlueprintCreator()
 		{
+			uses = new ItemPrintedGun.VoxelUses[VOXEL_TYPES];
+			colors = new Color[VOXEL_TYPES];
+			for (int i = 0; i < VOXEL_TYPES; i++)
+			{
+				uses[i] = ItemPrintedGun.VoxelUses.STRUCTURE;
+				colors[i] = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+
 		}
 
 		@Override public void update()

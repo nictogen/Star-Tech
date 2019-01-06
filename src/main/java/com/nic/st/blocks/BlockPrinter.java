@@ -181,8 +181,8 @@ public class BlockPrinter extends Block
 					if (blueprintArray[i] != 0)
 						n++;
 				}
-				int[][] colors = new int[4][];
-				for (int i = 0; i < 4; i++)
+				int[][] colors = new int[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES][];
+				for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 				{
 					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
 				}
@@ -208,8 +208,8 @@ public class BlockPrinter extends Block
 			if (!blueprint.isEmpty() && blueprint.getItem() instanceof ItemBlueprint && ticks > blueprint.getTagCompound().getInteger("total") * 200)
 			{
 				ticks = 0;
-				int[][] colors = new int[4][];
-				for (int i = 0; i < 4; i++)
+				int[][] colors = new int[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES][];
+				for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 				{
 					colors[i] = blueprint.getTagCompound().getIntArray("color" + i);
 				}

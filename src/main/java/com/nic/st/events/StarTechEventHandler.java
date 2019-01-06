@@ -42,24 +42,16 @@ public class StarTechEventHandler
 			Vec3d lookPos = event.getEntityPlayer().getLook(0.0f);
 			hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
-			if (buttonBox.offset(0.45, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			boolean exit = true;
+			for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES && exit; i++)
 			{
-				te.buttonDown = 3;
+				if (buttonBox.offset(0.75 - 0.1*i, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+				{
+					te.buttonDown = i;
+					exit = false;
+				}
 			}
-			else if (buttonBox.offset(0.55, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			{
-				te.buttonDown = 2;
-			}
-			else if (buttonBox.offset(0.65, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			{
-				te.buttonDown = 1;
-			}
-			else if (buttonBox.offset(0.75, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			{
-				te.buttonDown = 0;
-			}
-			else
-				return;
+			if(exit) return;
 			event.setCanceled(true);
 			te.markDirty();
 			IBlockState state = te.getWorld().getBlockState(te.getPos());
@@ -88,26 +80,29 @@ public class StarTechEventHandler
 			ItemStack stack = new ItemStack(StarTech.Items.blueprint);
 			NBTTagCompound compound = new NBTTagCompound();
 			compound.setByteArray("voxels", ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).voxels.clone());
-			for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
-			{
-				compound.setIntArray("color" + i, new int[] { ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getRed(),
-						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getGreen(),
-						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getBlue(),
-						((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getAlpha() });
-			}
-			int[] uses = new int[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES];
-			for (int i = 0; i < uses.length; i++)
-			{
-				uses[i] = ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses[i].ordinal();
-			}
-			compound.setIntArray("uses", uses);
+
 
 			ItemPrintedGun.GunStats gunStats = new ItemPrintedGun.GunStats(((BlockBlueprintCreator.TileEntityBlueprintCreator) te).voxels, ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses);
 
-			compound.setInteger("total", gunStats.totalVoxels);
-
 			if(gunStats.isValid())
 			{
+				for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
+				{
+					compound.setIntArray("color" + i, new int[] { ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getRed(),
+							((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getGreen(),
+							((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getBlue(),
+							((BlockBlueprintCreator.TileEntityBlueprintCreator) te).colors[i].getAlpha() });
+				}
+
+				int[] uses = new int[BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES];
+				for (int i = 0; i < uses.length; i++)
+				{
+					uses[i] = ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses[i].ordinal();
+				}
+				compound.setIntArray("uses", uses);
+
+				compound.setInteger("total", gunStats.totalVoxels);
+
 				stack.setTagCompound(compound);
 				event.getEntityPlayer().addItemStackToInventory(stack);
 			} else {

@@ -62,17 +62,12 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		GlStateManager.translate(te.getPos().getX() + 0.75, te.getPos().getY() + 0.2, te.getPos().getZ() - 0.3);
 		GlStateManager.rotate(20f, 1, 0, 0);
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 0 ? pushedButtonBox : buttonBox), (float) te.colors[0].getRed() / 255f,
-				(float) te.colors[0].getGreen() / 255f, (float) te.colors[0].getBlue() / 255f, (float) te.colors[0].getAlpha() / 255f);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 1 ? pushedButtonBox : buttonBox).offset(-0.1, 0, 0),
-				(float) te.colors[1].getRed() / 255f, (float) te.colors[1].getGreen() / 255f, (float) te.colors[1].getBlue() / 255f,
-				(float) te.colors[1].getAlpha() / 255f);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 2 ? pushedButtonBox : buttonBox).offset(-0.2, 0, 0),
-				(float) te.colors[2].getRed() / 255f, (float) te.colors[2].getGreen() / 255f, (float) te.colors[2].getBlue() / 255f,
-				(float) te.colors[2].getAlpha() / 255f);
-		ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == 3 ? pushedButtonBox : buttonBox).offset(-0.3, 0, 0),
-				(float) te.colors[3].getRed() / 255f, (float) te.colors[3].getGreen() / 255f, (float) te.colors[3].getBlue() / 255f,
-				(float) te.colors[3].getAlpha() / 255f);
+
+		for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
+		{
+			ClientUtils.addTexturedBoxVertices(bufferbuilder, (te.buttonDown == i ? pushedButtonBox : buttonBox).offset(-0.1*i, 0, 0), (float) te.colors[i].getRed() / 255f,
+					(float) te.colors[i].getGreen() / 255f, (float) te.colors[i].getBlue() / 255f, (float) te.colors[i].getAlpha() / 255f);
+		}
 
 		tessellator.draw();
 		GlStateManager.popMatrix();
