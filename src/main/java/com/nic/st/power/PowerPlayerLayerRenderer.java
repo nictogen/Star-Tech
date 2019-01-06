@@ -19,14 +19,20 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.Random;
 
 /**
  * Created by Nictogen on 4/25/18.
  */
+@Mod.EventBusSubscriber(Side.CLIENT)
 public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 {
 	private ModelPlayer model = new ModelPlayer(0.01f, false);
@@ -48,17 +54,31 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			for (Ability ability : IItemAbilityContainer.getAbilities(entitylivingbaseIn, entitylivingbaseIn.getHeldItemMainhand()))
 			{
 				if(ability instanceof AbilityTendrils && ability.isEnabled())
-					renderBeams(entitylivingbaseIn, EnumHand.MAIN_HAND, ability.getTicks());
+					renderBeams(entitylivingbaseIn, EnumHand.MAIN_HAND, renderPlayer, ability.getTicks());
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public static void onRenderHand(RenderHandEvent event){
+		if(Minecraft.getMinecraft().gameSettings.thirdPersonView != 0) return;
+		EntityPlayer player = Minecraft.getMinecraft().player;
+
+		//TODO disable ability in offhand, or figure out why it's not updating when in offhand
+		if(player.getHeldItemMainhand().getItem() instanceof IItemAbilityContainer){
+			for (Ability ability : IItemAbilityContainer.getAbilities(player, player.getHeldItemMainhand()))
+			{
+				if(ability instanceof AbilityTendrils && ability.isEnabled())
+				{
+					EnumHandSide side = (player.getPrimaryHand() == EnumHandSide.RIGHT) ? EnumHandSide.RIGHT : EnumHandSide.LEFT;
+					GlStateManager.pushMatrix();
+					GlStateManager.translate(side == EnumHandSide.RIGHT ? 0.9 : -0.8, -0.9, -1);
+					renderBeams(player, EnumHand.MAIN_HAND, null, ability.getTicks());
+					GlStateManager.popMatrix();
+				}
 			}
 		}
 
-		if(entitylivingbaseIn.getHeldItemOffhand().getItem() instanceof IItemAbilityContainer){
-			for (Ability ability : IItemAbilityContainer.getAbilities(entitylivingbaseIn, entitylivingbaseIn.getHeldItemOffhand()))
-			{
-				if(ability instanceof AbilityTendrils && ability.isEnabled())
-					renderBeams(entitylivingbaseIn, EnumHand.OFF_HAND, ability.getTicks());
-			}
-		}
 	}
 
 	private void renderCracking(EntityPlayer entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
@@ -96,7 +116,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 		}
 	}
 
-	private void renderBeams(EntityLivingBase entityLivingBase, EnumHand hand, float progress)
+	private static void renderBeams(EntityLivingBase entityLivingBase, EnumHand hand, @Nullable RenderPlayer renderPlayer, float progress)
 	{
 		EnumHandSide side = (entityLivingBase.getPrimaryHand() == EnumHandSide.RIGHT) ?
 				(hand == EnumHand.MAIN_HAND) ? EnumHandSide.RIGHT : EnumHandSide.LEFT :
@@ -108,14 +128,16 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 		GlStateManager.pushMatrix();
 		GlStateManager.disableLighting();
 		GlStateManager.disableTexture2D();
-		//		GlStateManager.disableCull();
+		GlStateManager.disableCull();
 		GlStateManager.enableAlpha();
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 
+		if(renderPlayer != null)
 		renderPlayer.getMainModel().postRenderArm(0.0625F, side);
+
 		GlStateManager.translate(-0.1, 0.5, 0.5);
 		Random r = new Random(entityLivingBase.getEntityId());
 		for (int n = 0; n < 8; n++)
@@ -153,7 +175,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 		GlStateManager.disableBlend();
 		GlStateManager.enableLighting();
 		GlStateManager.enableTexture2D();
-		//		GlStateManager.enableCull();
+		GlStateManager.enableCull();
 		GlStateManager.popMatrix();
 		LCRenderHelper.restoreLightmapTextureCoords();
 	}
