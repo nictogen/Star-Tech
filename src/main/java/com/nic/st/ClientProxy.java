@@ -9,13 +9,15 @@ import com.nic.st.client.PrintedGunModel;
 import com.nic.st.client.PrinterRenderer;
 import com.nic.st.client.gui.GuiEditCreatorButton;
 import com.nic.st.entity.EntityBullet;
+import com.nic.st.entity.EntityItemIndestructibleST;
 import com.nic.st.items.ItemPrintedGun;
+import com.nic.st.power.AbilityPowerCyclone;
 import com.nic.st.power.EntityPowerRocket;
-import com.nic.st.power.PowerClientEventHandler;
 import com.nic.st.power.PowerRocketRenderer;
 import com.nic.st.util.ClientUtils;
 import com.nic.st.util.LimbManipulationUtil;
 import lucraft.mods.lucraftcore.infinity.render.ItemRendererInfinityStone;
+import lucraft.mods.lucraftcore.infinity.render.RenderEntityInfinityStone;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -118,8 +120,9 @@ public class ClientProxy extends CommonProxy
 		ModelLoaderRegistry.registerLoader(new PrintedGunModel.PrintedGunModelLoader());
 		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, BulletRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityPowerRocket.class, PowerRocketRenderer::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityItemIndestructibleST.class, RenderEntityInfinityStone::new);
 		OBJLoader.INSTANCE.addDomain(StarTech.MODID);
-		MinecraftForge.EVENT_BUS.register(new PowerClientEventHandler());
+		MinecraftForge.EVENT_BUS.register(new AbilityPowerCyclone.ClientHandler());
 	}
 
 	@Override public void init(FMLInitializationEvent event)

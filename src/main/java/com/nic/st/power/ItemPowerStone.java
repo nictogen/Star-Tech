@@ -1,12 +1,13 @@
 package com.nic.st.power;
 
 import com.nic.st.StarTech;
+import com.nic.st.entity.EntityItemIndestructibleST;
+import lucraft.mods.lucraftcore.infinity.EntityItemIndestructible;
 import lucraft.mods.lucraftcore.infinity.EnumInfinityStone;
 import lucraft.mods.lucraftcore.infinity.items.ItemInfinityStone;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
 import lucraft.mods.lucraftcore.superpowers.items.IItemAbilityContainer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,6 +16,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,6 @@ import java.util.List;
  */
 public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityContainer
 {
-	//TODO convert right click to ability
 	public ItemPowerStone()
 	{
 		setRegistryName(StarTech.MODID, "power_stone");
@@ -46,62 +47,28 @@ public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityCon
 		return new ArrayList();
 	}
 
-	public static int getPowerStoneDuration(EntityPlayer player)
-	{
-		ItemStack stack = player.getHeldItemMainhand();
-		int progress = 0;
-		if (stack.getItem() instanceof ItemPowerStone)
-		{
-			if (!stack.hasTagCompound())
-				stack.setTagCompound(new NBTTagCompound());
-			progress = stack.getTagCompound().getInteger("power_duration");
-		}
-
-		stack = player.getHeldItemOffhand();
-		if (stack.getItem() instanceof ItemPowerStone)
-		{
-			if (!stack.hasTagCompound())
-				stack.setTagCompound(new NBTTagCompound());
-			int a = stack.getTagCompound().getInteger("power_duration");
-			progress = a > progress ? a : progress;
-		}
-		return progress;
-	}
-
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand)
 	{
-
 		ItemStack stack = player.getHeldItem(hand);
-
 		return new ActionResult<>(EnumActionResult.PASS, stack);
 	}
 
-	@Override public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
-	{
-		if (!stack.hasTagCompound())
-			stack.setTagCompound(new NBTTagCompound());
-		if (entityIn instanceof EntityPlayer && (((EntityPlayer) entityIn).getHeldItemMainhand() == stack
-				|| ((EntityPlayer) entityIn).getHeldItemOffhand() == stack))
-		{
-			stack.getTagCompound().setInteger("power_duration", stack.getTagCompound().getInteger("power_duration") + 1);
-		}
-		else
-		{
-			stack.getTagCompound().setInteger("power_duration", 0);
-			stack.getTagCompound().setInteger("power_use", 0);
-		}
-	}
-
-	//TODO add "if (getItem().getItem().onEntityItemUpdate(this)) return;"
-	// to EntityItemIndestructible
-
-	@Override public boolean onEntityItemUpdate(EntityItem entityItem)
+	public void onEntityItemIndestructibleUpdate(EntityItemIndestructible entityItem)
 	{
 		if (!entityItem.getItem().hasTagCompound())
 			entityItem.getItem().setTagCompound(new NBTTagCompound());
-		entityItem.getItem().getTagCompound().setInteger("power_duration", 0);
-		entityItem.getItem().getTagCompound().setInteger("power_use", 0);
-		return false;
+		entityItem.getItem().getTagCompound().setTag("lc_item_abilities", new NBTTagCompound());
+	}
+
+	@Nullable
+	@Override
+	public Entity createEntity(World world, Entity location, ItemStack itemstack) {
+		EntityItemIndestructibleST item = new EntityItemIndestructibleST(world, location.posX, location.posY, location.posZ, itemstack);
+		item.setEntitySize(entityHeight, entityWidth);
+		item.motionX = location.motionX;
+		item.motionY = location.motionY;
+		item.motionZ = location.motionZ;
+		return item;
 	}
 
 	@Override public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
@@ -112,6 +79,7 @@ public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityCon
 	@Override public List<Ability> getDefaultAbilities(EntityPlayer player, List<Ability> list, ItemStack itemStack)
 	{
 		list.add(new AbilityTendrils(player).setUnlocked(true));
+		list.add(new AbilityPowerCyclone(player).setUnlocked(true));
 		return list;
 	}
 }

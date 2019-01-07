@@ -4,9 +4,11 @@ import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.entity.EntityBullet;
+import com.nic.st.entity.EntityItemIndestructibleST;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.network.MessageChangeVoxel;
+import com.nic.st.power.AbilityPowerCyclone;
 import com.nic.st.power.AbilityTendrils;
 import com.nic.st.power.EntityPowerRocket;
 import com.nic.st.power.ItemPowerStone;
@@ -69,12 +71,16 @@ public class StarTech
 				EntityEntryBuilder.create().entity(EntityPowerRocket.class).id(new ResourceLocation(MODID, "power_rocket"), 1).name("power_rocket")
 						.tracker(80, 10, true)
 						.build());
+		event.getRegistry().register(
+				EntityEntryBuilder.create().entity(EntityItemIndestructibleST.class).id(new ResourceLocation(MODID, "indestructible_item"), 2).name("indestructible_item").tracker(80, 10, true)
+						.build());
 	}
 
 
 	@SubscribeEvent
 	public static void onRegisterAbilities(RegistryEvent.Register<Ability.AbilityEntry> e) {
 		e.getRegistry().register(new Ability.AbilityEntry(AbilityTendrils.class, new ResourceLocation(MODID, "tendrils")));
+		e.getRegistry().register(new Ability.AbilityEntry(AbilityPowerCyclone.class, new ResourceLocation(MODID, "power_cyclone")));
 	}
 
 

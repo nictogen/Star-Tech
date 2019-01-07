@@ -85,7 +85,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			float headPitch, float scale)
 	{
 		TextureManager manager = Minecraft.getMinecraft().getTextureManager();
-		if (PowerClientEventHandler.glowingTexture != null)
+		if (AbilityPowerCyclone.ClientHandler.glowingTexture != null)
 		{
 			GlStateManager.pushMatrix();
 			GlStateManager.disableLighting();
@@ -93,7 +93,7 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			this.model.setLivingAnimations(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			LCRenderHelper.setLightmapTextureCoords(240, 240);
-			ResourceLocation texLoc = manager.getDynamicTextureLocation("glowing_skin", PowerClientEventHandler.glowingTexture);
+			ResourceLocation texLoc = manager.getDynamicTextureLocation("glowing_skin", AbilityPowerCyclone.ClientHandler.glowingTexture);
 			this.renderPlayer.bindTexture(texLoc);
 			this.model.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 			manager.deleteTexture(texLoc);
@@ -102,13 +102,13 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			GlStateManager.popMatrix();
 		}
 
-		if (PowerClientEventHandler.extendedTexture != null)
+		if (AbilityPowerCyclone.ClientHandler.extendedTexture != null)
 		{
 			GlStateManager.pushMatrix();
 			this.biggerModel.setModelAttributes(this.renderPlayer.getMainModel());
 			this.biggerModel.setLivingAnimations(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			ResourceLocation texLoc = manager.getDynamicTextureLocation("power_skin", PowerClientEventHandler.extendedTexture);
+			ResourceLocation texLoc = manager.getDynamicTextureLocation("power_skin", AbilityPowerCyclone.ClientHandler.extendedTexture);
 			this.renderPlayer.bindTexture(texLoc);
 			this.biggerModel.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 			manager.deleteTexture(texLoc);
