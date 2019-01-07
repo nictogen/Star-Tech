@@ -248,24 +248,16 @@ public class ClientProxy extends CommonProxy
 			Vec3d lookPos = event.getEntityPlayer().getLook(0.0f);
 			hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
-			if (buttonBox.offset(0.45, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+			boolean b = true;
+			for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 			{
-				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 3));
+				if (buttonBox.offset(0.75 - i*0.1, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+				{
+					Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 3));
+					b = true;
+				}
 			}
-			else if (buttonBox.offset(0.55, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			{
-				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 2));
-			}
-			else if (buttonBox.offset(0.65, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			{
-				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 1));
-			}
-			else if (buttonBox.offset(0.75, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
-			{
-				Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 0));
-			}
-			else
-				return;
+			if(!b) return;
 			event.setCanceled(true);
 			te.markDirty();
 			IBlockState state = te.getWorld().getBlockState(te.getPos());
