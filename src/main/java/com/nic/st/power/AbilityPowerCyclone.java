@@ -5,7 +5,6 @@ import com.nic.st.StarTech;
 import com.nic.st.util.Utils;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
 import lucraft.mods.lucraftcore.superpowers.abilities.AbilityConstant;
-import lucraft.mods.lucraftcore.superpowers.items.IItemAbilityContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -16,6 +15,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
@@ -27,6 +27,7 @@ import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -45,24 +46,18 @@ import java.util.Random;
  */
 public class AbilityPowerCyclone extends AbilityConstant
 {
-	public AbilityPowerCyclone(EntityPlayer player)
+	public AbilityPowerCyclone(EntityLivingBase player)
 	{
 		super(player);
 	}
 
 	@Override public void updateTick()
 	{
-		if (player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
-		{
-			if (!player.world.isRemote && ticks % 20 == 0)
-				shootRocket(EnumHand.MAIN_HAND, player);
-		}
-		else
-			this.ticks = 0;
-
+		if (!entity.world.isRemote && ticks % 20 == 0)
+			shootRocket((context == EnumAbilityContext.OFF_HAND) ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, entity);
 	}
 
-	private static void shootRocket(EnumHand hand, EntityPlayer player)
+	public static void shootRocket(EnumHand hand, EntityLivingBase player)
 	{
 		EntityPowerRocket rocket = new EntityPowerRocket(player.world, player);
 		EnumHandSide side = (player.getPrimaryHand() == EnumHandSide.RIGHT) ?
@@ -84,22 +79,15 @@ public class AbilityPowerCyclone extends AbilityConstant
 		@SubscribeEvent
 		public void onUpdate(LivingEvent.LivingUpdateEvent event)
 		{
-			if (event.getEntity() instanceof EntityPlayer)
+			for (Ability ability : Ability.getAbilities(event.getEntityLiving()))
 			{
-				EntityPlayer player = (EntityPlayer) event.getEntity();
-				if (player.getHeldItemMainhand().getItem() instanceof IItemAbilityContainer)
-				{
-					for (Ability ability : IItemAbilityContainer.getAbilities(player, player.getHeldItemMainhand()))
-					{
-						if (ability instanceof AbilityPowerCyclone && player.world.isRemote)
-							smokeRing(player, ability.getTicks());
-					}
-				}
+				if (ability instanceof AbilityPowerCyclone && event.getEntity().world.isRemote && ability.isUnlocked() && ability.isEnabled())
+					smokeRing(event.getEntityLiving(), ability.getTicks());
 			}
 		}
 
 		@SideOnly(Side.CLIENT)
-		private void smokeRing(EntityPlayer player, int progress)
+		private void smokeRing(EntityLivingBase player, int progress)
 		{
 			World w = player.world;
 
@@ -133,24 +121,30 @@ public class AbilityPowerCyclone extends AbilityConstant
 		}
 
 		@SubscribeEvent(receiveCanceled = true)
+		public void onInput(InputEvent event)
+		{
+			turnOffKeys();
+		}
+
+		@SubscribeEvent(receiveCanceled = true)
 		public void onInput(TickEvent.ClientTickEvent event)
+		{
+			turnOffKeys();
+		}
+
+		private void turnOffKeys()
 		{
 			GameSettings s = Minecraft.getMinecraft().gameSettings;
 			EntityPlayer player = Minecraft.getMinecraft().player;
 			if (player != null && player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
 			{
-				if (s.keyBindForward.isPressed())
-					KeyBinding.setKeyBindState(s.keyBindForward.getKeyCode(), false);
-				if (s.keyBindBack.isPressed())
-					KeyBinding.setKeyBindState(s.keyBindBack.getKeyCode(), false);
-				if (s.keyBindLeft.isPressed())
-					KeyBinding.setKeyBindState(s.keyBindLeft.getKeyCode(), false);
-				if (s.keyBindRight.isPressed())
-					KeyBinding.setKeyBindState(s.keyBindRight.getKeyCode(), false);
-				if (s.keyBindJump.isPressed())
-					KeyBinding.setKeyBindState(s.keyBindJump.getKeyCode(), false);
-				if (!Minecraft.getMinecraft().player.isCreative() && Minecraft.getMinecraft().player.getHeldItemMainhand()
-						.getItem() instanceof ItemPowerStone)
+				KeyBinding.setKeyBindState(s.keyBindForward.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindBack.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindLeft.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindRight.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindJump.getKeyCode(), false);
+
+				if (!Minecraft.getMinecraft().player.isCreative() && Minecraft.getMinecraft().player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
 					for (int i = 0; i < s.keyBindsHotbar.length; i++)
 					{
 						if (s.keyBindsHotbar[i].isPressed())
@@ -167,15 +161,12 @@ public class AbilityPowerCyclone extends AbilityConstant
 			EntityPlayer player = Minecraft.getMinecraft().player;
 			if (player == null || player.isCreative() || event.getDwheel() == 0)
 				return;
-			if (player.getHeldItemMainhand().getItem() instanceof IItemAbilityContainer)
+			for (Ability ability : Ability.getAbilities(player))
 			{
-				for (Ability ability : IItemAbilityContainer.getAbilities(player, player.getHeldItemMainhand()))
+				if (ability instanceof AbilityPowerCyclone && ability.isUnlocked() && ability.isEnabled())
 				{
-					if (ability instanceof AbilityPowerCyclone)
-					{
-						event.setCanceled(true);
-						return;
-					}
+					event.setCanceled(true);
+					return;
 				}
 			}
 		}
@@ -202,66 +193,63 @@ public class AbilityPowerCyclone extends AbilityConstant
 				event.getRenderer().addLayer(new PowerPlayerLayerRenderer(event.getRenderer()));
 			}
 
-			if (event.getEntityPlayer().getHeldItemMainhand().getItem() instanceof IItemAbilityContainer)
+			for (Ability ability : Ability.getAbilities(event.getEntityLiving()))
 			{
-				for (Ability ability : IItemAbilityContainer.getAbilities(event.getEntityPlayer(), event.getEntityPlayer().getHeldItemMainhand()))
+				if (ability instanceof AbilityPowerCyclone)
 				{
-					if (ability instanceof AbilityPowerCyclone)
+					int progress = ability.getTicks();
+
+					if (progress > 0)
 					{
-						int progress = ability.getTicks();
+						TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
+						IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+						NetworkPlayerInfo info = ReflectionHelper
+								.getPrivateValue(AbstractClientPlayer.class, (AbstractClientPlayer) event.getEntityPlayer(), 0);
 
-						if (progress > 0)
+						skin = info.getLocationSkin();
+						BufferedImage replacementImage = TextureUtil.readBufferedImage(resourceManager.getResource(skin).getInputStream());
+						BufferedImage powerImage = TextureUtil.readBufferedImage(resourceManager.getResource(POWER_BACKGROUND).getInputStream());
+						BufferedImage extendedImage = new BufferedImage(replacementImage.getWidth(), replacementImage.getHeight(),
+								BufferedImage.TYPE_INT_ARGB);
+						BufferedImage glowingImage = new BufferedImage(replacementImage.getWidth(), replacementImage.getHeight(),
+								BufferedImage.TYPE_INT_ARGB);
+
+						Random r = new Random(EntityPlayer.getUUID(event.getEntityPlayer().getGameProfile()).getLeastSignificantBits());
+
+						for (int i = 0; i < progress; i++)
 						{
-							TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
-							IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-							NetworkPlayerInfo info = ReflectionHelper
-									.getPrivateValue(AbstractClientPlayer.class, (AbstractClientPlayer) event.getEntityPlayer(), 0);
-
-							skin = info.getLocationSkin();
-							BufferedImage replacementImage = TextureUtil.readBufferedImage(resourceManager.getResource(skin).getInputStream());
-							BufferedImage powerImage = TextureUtil.readBufferedImage(resourceManager.getResource(POWER_BACKGROUND).getInputStream());
-							BufferedImage extendedImage = new BufferedImage(replacementImage.getWidth(), replacementImage.getHeight(),
-									BufferedImage.TYPE_INT_ARGB);
-							BufferedImage glowingImage = new BufferedImage(replacementImage.getWidth(), replacementImage.getHeight(),
-									BufferedImage.TYPE_INT_ARGB);
-
-							Random r = new Random(EntityPlayer.getUUID(event.getEntityPlayer().getGameProfile()).getLeastSignificantBits());
-
-							for (int i = 0; i < progress; i++)
+							int x1 = r.nextInt(replacementImage.getWidth());
+							int y1 = r.nextInt(replacementImage.getHeight());
+							for (int n = 0; n < 4; n++)
 							{
-								int x1 = r.nextInt(replacementImage.getWidth());
-								int y1 = r.nextInt(replacementImage.getHeight());
-								for (int n = 0; n < 4; n++)
+								int x = Math.max(Math.min(replacementImage.getWidth() - 1, Math.max(0, x1 + Utils.randomInt3(r))), 0);
+								int y = Math.min(replacementImage.getHeight() - 1, Math.max(0, y1 + Utils.randomInt3(r)));
+
+								Color powerColor = new Color(powerImage.getRGB(x, y));
+								Color skinColor = new Color(replacementImage.getRGB(x, y));
+
+								if (!powerColor.equals(Color.BLACK) && !powerColor.equals(skinColor))
 								{
-									int x = Math.max(Math.min(replacementImage.getWidth() - 1, Math.max(0, x1 + Utils.randomInt3(r))), 0);
-									int y = Math.min(replacementImage.getHeight() - 1, Math.max(0, y1 + Utils.randomInt3(r)));
-
-									Color powerColor = new Color(powerImage.getRGB(x, y));
-									Color skinColor = new Color(replacementImage.getRGB(x, y));
-
-									if (!powerColor.equals(Color.BLACK) && !powerColor.equals(skinColor))
+									if (progress - 400 < i)
 									{
-										if (progress - 400 < i)
-										{
-											extendedImage.setRGB(x, y, skinColor.getRGB());
-										}
-										glowingImage.setRGB(x, y, powerColor.getRGB());
-										replacementImage.setRGB(x, y, powerColor.getRGB());
+										extendedImage.setRGB(x, y, skinColor.getRGB());
 									}
+									glowingImage.setRGB(x, y, powerColor.getRGB());
+									replacementImage.setRGB(x, y, powerColor.getRGB());
 								}
 							}
-
-							replacementTexture = new DynamicTexture(replacementImage);
-							extendedTexture = new DynamicTexture(extendedImage);
-							glowingTexture = new DynamicTexture(glowingImage);
-
-							Field textureMap = NetworkPlayerInfo.class.getDeclaredFields()[1];
-							textureMap.setAccessible(true);
-							Map<MinecraftProfileTexture.Type, ResourceLocation> playerTextures = (Map<MinecraftProfileTexture.Type, ResourceLocation>) textureMap
-									.get(info);
-							playerTextures.put(MinecraftProfileTexture.Type.SKIN, textureManager.getDynamicTextureLocation("power_skin", replacementTexture));
-							return;
 						}
+
+						replacementTexture = new DynamicTexture(replacementImage);
+						extendedTexture = new DynamicTexture(extendedImage);
+						glowingTexture = new DynamicTexture(glowingImage);
+
+						Field textureMap = NetworkPlayerInfo.class.getDeclaredFields()[1];
+						textureMap.setAccessible(true);
+						Map<MinecraftProfileTexture.Type, ResourceLocation> playerTextures = (Map<MinecraftProfileTexture.Type, ResourceLocation>) textureMap
+								.get(info);
+						playerTextures.put(MinecraftProfileTexture.Type.SKIN, textureManager.getDynamicTextureLocation("power_skin", replacementTexture));
+						return;
 					}
 				}
 			}

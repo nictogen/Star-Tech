@@ -3,6 +3,8 @@ package com.nic.st.util;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.*;
@@ -266,5 +268,24 @@ public class Utils
 		while (d == 0)
 			d = w.rand.nextGaussian() / divisor;
 		return d;
+	}
+
+	public static RayTraceResult rayTrace(EntityLivingBase player, double distance) {
+		Vec3d lookVec = player.getLookVec();
+		for (int i = 0; i < distance * 2; i++) {
+			float scale = i / 2F;
+			Vec3d pos = player.getPositionVector().add(0, player.getEyeHeight(), 0).add(lookVec.scale(scale));
+
+			if (player.world.isBlockFullCube(new BlockPos(pos)) && !player.world.isAirBlock(new BlockPos(pos))) {
+				return new RayTraceResult(pos, null);
+			} else {
+				Vec3d pos1 = pos.add(0.25F, 0.25F, 0.25F);
+				Vec3d pos2 = pos.add(-0.25F, -0.25F, -0.25F);
+				for (Entity entity : player.world.getEntitiesWithinAABBExcludingEntity(player, new AxisAlignedBB(pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z))) {
+					return new RayTraceResult(entity);
+				}
+			}
+		}
+		return new RayTraceResult(player.getPositionVector().add(lookVec.scale(distance)), null);
 	}
 }

@@ -6,8 +6,9 @@ import lucraft.mods.lucraftcore.infinity.EntityItemIndestructible;
 import lucraft.mods.lucraftcore.infinity.EnumInfinityStone;
 import lucraft.mods.lucraftcore.infinity.items.ItemInfinityStone;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
-import lucraft.mods.lucraftcore.superpowers.items.IItemAbilityContainer;
+import lucraft.mods.lucraftcore.superpowers.abilities.supplier.IAbilityProvider;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,13 +18,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Nictogen on 7/27/18.
  */
-public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityContainer
+public class ItemPowerStone extends ItemInfinityStone implements IAbilityProvider
 {
 	public ItemPowerStone()
 	{
@@ -42,11 +41,6 @@ public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityCon
 		return false;
 	}
 
-	@Override public List getAbilityBarEntries(EntityPlayer player, ItemStack stack)
-	{
-		return new ArrayList();
-	}
-
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand)
 	{
 		ItemStack stack = player.getHeldItem(hand);
@@ -62,7 +56,8 @@ public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityCon
 
 	@Nullable
 	@Override
-	public Entity createEntity(World world, Entity location, ItemStack itemstack) {
+	public Entity createEntity(World world, Entity location, ItemStack itemstack)
+	{
 		EntityItemIndestructibleST item = new EntityItemIndestructibleST(world, location.posX, location.posY, location.posZ, itemstack);
 		item.setEntitySize(entityHeight, entityWidth);
 		item.motionX = location.motionX;
@@ -76,10 +71,18 @@ public class ItemPowerStone extends ItemInfinityStone implements IItemAbilityCon
 		return oldStack.getItem() != newStack.getItem();
 	}
 
-	@Override public List<Ability> getDefaultAbilities(EntityPlayer player, List<Ability> list, ItemStack itemStack)
+	@Override public Ability.AbilityMap addStoneAbilities(EntityLivingBase entity, Ability.AbilityMap abilities, Ability.EnumAbilityContext context)
 	{
-		list.add(new AbilityTendrils(player).setUnlocked(true));
-		list.add(new AbilityPowerCyclone(player).setUnlocked(true));
-		return list;
+		abilities.put("power_blast", new AbilityPowerBlast(entity));
+		abilities.put("power_impower", new AbilityPowerImpower(entity));
+		abilities.put("power_rocket_burst", new AbilityRocketBurst(entity));
+		return super.addStoneAbilities(entity, abilities, context);
+	}
+
+	@Override public Ability.AbilityMap addDefaultAbilities(EntityLivingBase entity, Ability.AbilityMap abilities, Ability.EnumAbilityContext context)
+	{
+		abilities.put("power_tendrils", new AbilityTendrils(entity));
+		abilities.put("power_cyclone", new AbilityPowerCyclone(entity));
+		return abilities;
 	}
 }

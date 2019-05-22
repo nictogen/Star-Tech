@@ -3,10 +3,7 @@ package com.nic.st;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
-import com.nic.st.client.BlueprintCreatorRenderer;
-import com.nic.st.client.BulletRenderer;
-import com.nic.st.client.PrintedGunModel;
-import com.nic.st.client.PrinterRenderer;
+import com.nic.st.client.*;
 import com.nic.st.client.gui.GuiEditCreatorButton;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.entity.EntityItemIndestructibleST;
@@ -26,6 +23,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
@@ -128,6 +126,8 @@ public class ClientProxy extends CommonProxy
 	@Override public void init(FMLInitializationEvent event)
 	{
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new PrintedGunModel.PrintedGunColorizer(), StarTech.Items.printedGun);
+		ParticleManager pm = Minecraft.getMinecraft().effectRenderer;
+		pm.registerParticle(ParticleColoredCloudOld.ID, new ParticleColoredCloudOld.Factory());
 	}
 
 	@Override public void postInit(FMLPostInitializationEvent event)
@@ -248,12 +248,12 @@ public class ClientProxy extends CommonProxy
 			Vec3d lookPos = event.getEntityPlayer().getLook(0.0f);
 			hitVec = hitVec.add(lookPos.x * 5, lookPos.y * 5, lookPos.z * 5);
 
-			boolean b = true;
+			boolean b = false;
 			for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 			{
 				if (buttonBox.offset(0.75 - i*0.1, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 				{
-					Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), 3));
+					Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), i));
 					b = true;
 				}
 			}

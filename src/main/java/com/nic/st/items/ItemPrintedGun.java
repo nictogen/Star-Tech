@@ -74,6 +74,7 @@ public class ItemPrintedGun extends Item
 		return nbt;
 	}
 
+	//TODO either cooldown or ammo as a gui (possibly both)
 	@Override public double getDurabilityForDisplay(ItemStack stack)
 	{
 		NBTTagCompound gunData = getGunData(stack);
@@ -186,8 +187,6 @@ public class ItemPrintedGun extends Item
 			Vec3d offset = eyes.add(rotVec.scale(0.3)).subtract(0, 0.1, 0);
 			EntityBullet entityBullet = new EntityBullet(worldIn, player);
 			entityBullet.damage = gunData.getDouble("damage");
-
-
 
 			entityBullet.setLocationAndAngles(offset.x, offset.y, offset.z, entityBullet.rotationYaw, entityBullet.rotationPitch);
 			entityBullet.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);

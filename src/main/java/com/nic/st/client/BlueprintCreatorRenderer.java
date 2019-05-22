@@ -88,7 +88,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 			int[] data = bakedQuad.getVertexData();
 			bufferbuilder.addVertexData(data);
 			NBTTagCompound colorCompound = new NBTTagCompound();
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 			{
 				colorCompound.setIntArray("color" + i,
 						new int[] { te.colors[i].getRed(), te.colors[i].getGreen(), te.colors[i].getBlue(), te.colors[i].getAlpha() });

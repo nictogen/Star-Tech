@@ -8,11 +8,9 @@ import com.nic.st.entity.EntityItemIndestructibleST;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.network.MessageChangeVoxel;
-import com.nic.st.power.AbilityPowerCyclone;
-import com.nic.st.power.AbilityTendrils;
-import com.nic.st.power.EntityPowerRocket;
-import com.nic.st.power.ItemPowerStone;
-import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
+import com.nic.st.network.MessageMovePlayer;
+import com.nic.st.power.*;
+import lucraft.mods.lucraftcore.superpowers.abilities.AbilityEntry;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -78,9 +76,13 @@ public class StarTech
 
 
 	@SubscribeEvent
-	public static void onRegisterAbilities(RegistryEvent.Register<Ability.AbilityEntry> e) {
-		e.getRegistry().register(new Ability.AbilityEntry(AbilityTendrils.class, new ResourceLocation(MODID, "tendrils")));
-		e.getRegistry().register(new Ability.AbilityEntry(AbilityPowerCyclone.class, new ResourceLocation(MODID, "power_cyclone")));
+	public static void onRegisterAbilities(RegistryEvent.Register<AbilityEntry> e) {
+		e.getRegistry().register(new AbilityEntry(AbilityTendrils.class, new ResourceLocation(MODID, "tendrils")));
+		e.getRegistry().register(new AbilityEntry(AbilityPowerCyclone.class, new ResourceLocation(MODID, "power_cyclone")));
+		e.getRegistry().register(new AbilityEntry(AbilityPowerBlast.class, new ResourceLocation(MODID, "power_blast")));
+		e.getRegistry().register(new AbilityEntry(AbilityPowerImpower.class, new ResourceLocation(MODID, "power_impower")));
+		e.getRegistry().register(new AbilityEntry(AbilityRocketBurst.class, new ResourceLocation(MODID, "power_rocket_burst")));
+
 	}
 
 
@@ -115,6 +117,7 @@ public class StarTech
 
 		simpleNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
 		simpleNetworkWrapper.registerMessage(MessageChangeVoxel.Handler.class, MessageChangeVoxel.class, 0, Side.SERVER);
+		simpleNetworkWrapper.registerMessage(MessageMovePlayer.Handler.class, MessageMovePlayer.class, 1, Side.CLIENT);
 	}
 
 	@EventHandler

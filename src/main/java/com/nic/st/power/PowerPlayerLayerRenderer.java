@@ -2,7 +2,6 @@ package com.nic.st.power;
 
 import com.nic.st.util.ClientUtils;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
-import lucraft.mods.lucraftcore.superpowers.items.IItemAbilityContainer;
 import lucraft.mods.lucraftcore.util.helper.LCRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelPlayer;
@@ -49,14 +48,13 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			float headPitch, float scale)
 	{
 		renderCracking(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-		
-		if(entitylivingbaseIn.getHeldItemMainhand().getItem() instanceof IItemAbilityContainer){
-			for (Ability ability : IItemAbilityContainer.getAbilities(entitylivingbaseIn, entitylivingbaseIn.getHeldItemMainhand()))
+
+			for (Ability ability : Ability.getAbilities(entitylivingbaseIn))
 			{
 				if(ability instanceof AbilityTendrils && ability.isEnabled())
-					renderBeams(entitylivingbaseIn, EnumHand.MAIN_HAND, renderPlayer, ability.getTicks());
+					renderBeams(entitylivingbaseIn, (ability.context == Ability.EnumAbilityContext.OFF_HAND) ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, renderPlayer, ability.getTicks());
 			}
-		}
+
 	}
 
 	@SubscribeEvent
@@ -64,20 +62,17 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 		if(Minecraft.getMinecraft().gameSettings.thirdPersonView != 0) return;
 		EntityPlayer player = Minecraft.getMinecraft().player;
 
-		//TODO disable ability in offhand, or figure out why it's not updating when in offhand
-		if(player.getHeldItemMainhand().getItem() instanceof IItemAbilityContainer){
-			for (Ability ability : IItemAbilityContainer.getAbilities(player, player.getHeldItemMainhand()))
+		for (Ability ability : Ability.getAbilities(player))
 			{
 				if(ability instanceof AbilityTendrils && ability.isEnabled())
 				{
-					EnumHandSide side = (player.getPrimaryHand() == EnumHandSide.RIGHT) ? EnumHandSide.RIGHT : EnumHandSide.LEFT;
+					EnumHandSide side = (player.getPrimaryHand() == EnumHandSide.RIGHT && !(ability.context == Ability.EnumAbilityContext.OFF_HAND)) ? EnumHandSide.RIGHT : EnumHandSide.LEFT;
 					GlStateManager.pushMatrix();
 					GlStateManager.translate(side == EnumHandSide.RIGHT ? 0.9 : -0.8, -0.9, -1);
-					renderBeams(player, EnumHand.MAIN_HAND, null, ability.getTicks());
+					renderBeams(player, (ability.context == Ability.EnumAbilityContext.OFF_HAND) ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, null, ability.getTicks());
 					GlStateManager.popMatrix();
 				}
 			}
-		}
 
 	}
 

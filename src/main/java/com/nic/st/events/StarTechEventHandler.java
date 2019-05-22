@@ -106,7 +106,7 @@ public class StarTechEventHandler
 				stack.setTagCompound(compound);
 				event.getEntityPlayer().addItemStackToInventory(stack);
 			} else {
-				event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("Structure voxels must make up at least 25% of your weapon."), true); //TODO translate
+				event.getEntityPlayer().sendStatusMessage(new TextComponentTranslation("star-tech.notenoughstructure"), true);
 			}
 		}
 		else if (event.getHand() == EnumHand.MAIN_HAND)

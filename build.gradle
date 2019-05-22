@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    deobfCompile ('com.gitlab.lcoremodders:LucraftCore:060b6bda50') {
+    deobfCompile ('com.gitlab.lcoremodders:LucraftCore:b7970554') {
         exclude group: 'slimeknights.mantle'
         exclude group: 'slimeknights'
         exclude group: 'cofh'
