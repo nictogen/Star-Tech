@@ -57,7 +57,6 @@ public class ItemRendererCosmiRod extends TileEntityItemStackRenderer
 						s.getItem().getTileEntityItemStackRenderer().renderByItem(s, partialTicks);
 
 					GlStateManager.popMatrix();
-					//TODO render color
 				}
 			}
 			if(!color)
