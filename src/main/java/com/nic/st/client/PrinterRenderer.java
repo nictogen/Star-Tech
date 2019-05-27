@@ -21,7 +21,26 @@ public class PrinterRenderer extends TileEntitySpecialRenderer<BlockPrinter.Tile
 	{
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);
-
+		switch (te.getWorld().getBlockState(te.getPos()).getValue(BlockPrinter.FACING)){
+		case DOWN:
+			break;
+		case UP:
+			break;
+		case NORTH:
+			GlStateManager.rotate(180f, 0, 1f, 0);
+			GlStateManager.translate(-1f, 0f, -1f);
+			break;
+		case SOUTH:
+			break;
+		case WEST:
+			GlStateManager.rotate(-90f, 0, 1f, 0);
+			GlStateManager.translate(0f, 0f, -1f);
+			break;
+		case EAST:
+			GlStateManager.rotate(90f, 0, 1f, 0);
+			GlStateManager.translate(-1f, 0f, 0f);
+			break;
+		}
 		if (!te.gun.isEmpty())
 		{
 			GlStateManager.pushMatrix();

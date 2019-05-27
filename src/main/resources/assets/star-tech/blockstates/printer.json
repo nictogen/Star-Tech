@@ -1,13 +1,49 @@
 {
   "forge_marker": 1,
   "variants": {
-    "empty": {
-      "true": {
-        "model": "star-tech:printer_empty.obj"
-      },
-      "false": {
-        "model": "star-tech:printer.obj"
-      }
+    "empty=false,facing=east": {
+      "model": "star-tech:printer.obj",
+      "y": 270
+    },
+    "empty=false,facing=south": {
+      "model": "star-tech:printer.obj",
+      "y": 0
+    },
+    "empty=false,facing=west": {
+      "model": "star-tech:printer.obj",
+      "y": 90
+    },
+    "empty=false,facing=north": {
+      "model": "star-tech:printer.obj",
+      "y": 180
+    },
+    "empty=false,facing=up": {
+      "model": "star-tech:printer.obj"
+    },
+    "empty=false,facing=down": {
+      "model": "star-tech:printer.obj"
+    },
+    "empty=true,facing=east": {
+      "model": "star-tech:printer_empty.obj",
+      "y": 270
+    },
+    "empty=true,facing=south": {
+      "model": "star-tech:printer_empty.obj",
+      "y": 0
+    },
+    "empty=true,facing=west": {
+      "model": "star-tech:printer_empty.obj",
+      "y": 90
+    },
+    "empty=true,facing=north": {
+      "model": "star-tech:printer_empty.obj",
+      "y": 180
+    },
+    "empty=true,facing=up": {
+      "model": "star-tech:printer_empty.obj"
+    },
+    "empty=true,facing=down": {
+      "model": "star-tech:printer_empty.obj"
     }
   }
 }

@@ -79,7 +79,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		GlStateManager.translate(te.getPos().getX(), te.getPos().getY() + 1.5f, te.getPos().getZ() + 0.25);
 		if (!quadCache.containsKey(te) || !te.useCachedModel)
 		{
-			quadCache.put(te, ClientUtils.createQuads(te.voxels, 1024));
+			quadCache.put(te, ClientUtils.createQuads(te.voxels, 1024, new int[]{}));
 			te.useCachedModel = true;
 		}
 

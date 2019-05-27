@@ -50,7 +50,7 @@ public class PrintedGunModel implements IBakedModel
 	public PrintedGunModel(NBTTagCompound compound)
 	{
 		this.compound = compound;
-		this.quads = ClientUtils.createQuads(compound.getByteArray("voxels"), (int) Math.round(((double) compound.getInteger("ammo")) / 250.0));
+		this.quads = ClientUtils.createQuads(compound.getByteArray("voxels"), (int) Math.round((((double) compound.getInteger("ammo")) / (double) compound.getInteger("max_ammo"))* (double) compound.getInteger("ammo_voxels")), compound.getIntArray("ammo_indexes"));
 	}
 
 	@Override public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand)
@@ -160,11 +160,16 @@ public class PrintedGunModel implements IBakedModel
 
 	public static class PrintedGunColorizer implements IItemColor
 	{
-
+		//TODO check how much darker
 		@Override public int colorMultiplier(ItemStack stack, int tintIndex)
 		{
+			boolean darker = false;
+			if(tintIndex < 0){
+				tintIndex = -tintIndex;
+				darker = true;
+			}
 			int[] color = stack.hasTagCompound() ? stack.getTagCompound().getIntArray("color" + (tintIndex - 1)) : null;
-			return (color == null || color.length == 0 ? new Color(0, 0, 0) : new Color(color[0], color[1], color[2], color[3])).getRGB();
+			return (color == null || color.length == 0 ? new Color(0, 0, 0) : darker ? new Color(color[0], color[1], color[2], color[3]).darker().darker().darker() : new Color(color[0], color[1], color[2], color[3])).getRGB();
 		}
 	}
 

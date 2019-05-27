@@ -65,7 +65,7 @@ public class ClientUtils
 		Minecraft.getMinecraft().renderEngine.bindTexture(VOXEL_TEXTURE);
 	}
 
-	public static List<BakedQuad> createQuads(byte[] voxels, int ammo)
+	public static List<BakedQuad> createQuads(byte[] voxels, int ammo, int[] ammoNumbers)
 	{
 		AxisAlignedBB voxel = new AxisAlignedBB(0, 0, 0, 0.0625, 0.0625, 0.0625);
 		ArrayList<BakedQuad> quads = new ArrayList<>();
@@ -74,7 +74,12 @@ public class ClientUtils
 		Random r = new Random(123123213L);
 		for (int i = voxels.length - 1, vX = 0, vY = 0, vZ = 0; i >= 0; i--, vZ = i % size, vY = (i % (size * size)) / size, vX = i / (size * size))
 		{
-			int tintIndex = voxels[i] != 4 ? voxels[i] : (ammo-- > 0) ? 4 : 5;
+			int tintIndex = voxels[i];
+			for (int ammoNumber : ammoNumbers)
+				if(ammoNumber == voxels[i] && ammo-- < 0)
+					tintIndex *= -1;
+
+//			int tintIndex = voxels[i] != 4 ? voxels[i] : (ammo-- > 0) ? 4 : 5;
 			float randDarkness = r.nextFloat() / 10;
 			if (voxels[i] != 0)
 			{

@@ -4,11 +4,14 @@ import com.nic.st.StarTech;
 import com.nic.st.items.ItemBlueprint;
 import com.nic.st.items.ItemPrintedGun;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemAir;
 import net.minecraft.item.ItemStack;
@@ -31,7 +34,8 @@ import java.util.Random;
  */
 public class BlockPrinter extends Block
 {
-	public static final PropertyBool empty = PropertyBool.create("empty");
+	public static final PropertyBool EMPTY = PropertyBool.create("empty");
+	public static final PropertyDirection FACING = BlockDirectional.FACING;
 
 	public BlockPrinter()
 	{
@@ -39,17 +43,72 @@ public class BlockPrinter extends Block
 		setRegistryName(StarTech.MODID, "printer");
 		setTranslationKey("printer");
 		setHardness(2.0f).setResistance(10.0f);
+		setDefaultState(getBlockState().getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(EMPTY, true));
 		setCreativeTab(CreativeTabs.REDSTONE);
 	}
 
-	@Override public IBlockState getStateFromMeta(int meta)
+	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
 	{
-		return this.blockState.getBaseState();
+		super.onBlockAdded(worldIn, pos, state);
+		this.setDefaultDirection(worldIn, pos, state);
 	}
 
-	@Override public int getMetaFromState(IBlockState state)
+	private void setDefaultDirection(World worldIn, BlockPos pos, IBlockState state)
 	{
-		return 0;
+		if (!worldIn.isRemote)
+		{
+			EnumFacing enumfacing = state.getValue(FACING);
+			boolean flag = worldIn.getBlockState(pos.north()).isFullBlock();
+			boolean flag1 = worldIn.getBlockState(pos.south()).isFullBlock();
+
+			if (enumfacing == EnumFacing.NORTH && flag && !flag1)
+			{
+				enumfacing = EnumFacing.SOUTH;
+			}
+			else if (enumfacing == EnumFacing.SOUTH && flag1 && !flag)
+			{
+				enumfacing = EnumFacing.NORTH;
+			}
+			else
+			{
+				boolean flag2 = worldIn.getBlockState(pos.west()).isFullBlock();
+				boolean flag3 = worldIn.getBlockState(pos.east()).isFullBlock();
+
+				if (enumfacing == EnumFacing.WEST && flag2 && !flag3)
+				{
+					enumfacing = EnumFacing.EAST;
+				}
+				else if (enumfacing == EnumFacing.EAST && flag3 && !flag2)
+				{
+					enumfacing = EnumFacing.WEST;
+				}
+			}
+
+			worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing), 2);
+		}
+	}
+
+	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+	{
+		return this.getDefaultState().withProperty(FACING, EnumFacing.getDirectionFromEntityLiving(pos, placer));
+	}
+
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
+	{
+		worldIn.setBlockState(pos, state.withProperty(FACING, EnumFacing.getDirectionFromEntityLiving(pos, placer)), 2);
+	}
+
+	public IBlockState getStateFromMeta(int meta)
+	{
+		return this.getDefaultState().withProperty(FACING, EnumFacing.byIndex(meta & 7));
+	}
+
+	public int getMetaFromState(IBlockState state)
+	{
+		int i = 0;
+		i = i | state.getValue(FACING).getIndex();
+
+		return i;
 	}
 
 	@Override public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
@@ -57,14 +116,14 @@ public class BlockPrinter extends Block
 		TileEntity te = worldIn.getTileEntity(pos);
 		if (te instanceof TileEntityPrinter)
 		{
-			return state.withProperty(empty, ((TileEntityPrinter) te).blueprint.isEmpty());
+			return state.withProperty(EMPTY, ((TileEntityPrinter) te).blueprint.isEmpty());
 		}
-		return state.withProperty(empty, false);
+		return state.withProperty(EMPTY, false);
 	}
 
 	@Override protected BlockStateContainer createBlockState()
 	{
-		return new BlockStateContainer(this, empty);
+		return new BlockStateContainer(this, EMPTY, FACING);
 	}
 
 	@Deprecated

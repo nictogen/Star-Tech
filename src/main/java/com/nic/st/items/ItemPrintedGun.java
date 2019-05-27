@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -40,6 +41,8 @@ public class ItemPrintedGun extends Item
 			nbt.setInteger("max_ammo", -1);
 			nbt.setInteger("ammo", -1);
 			nbt.setDouble("damage", -1.0);
+			nbt.setIntArray("ammo_indexes", new int[]{});
+			nbt.setInteger("ammo_voxels", 0);
 			stack.setTagCompound(nbt);
 		}
 		return stack.getTagCompound();
@@ -50,25 +53,37 @@ public class ItemPrintedGun extends Item
 		NBTTagCompound nbt = getGunData(stack);
 
 		GunStats stats = new GunStats(voxels, uses);
-
+		HashSet<Integer> ammoIndexesSet = new HashSet<>();
+		for (int i = 0; i < uses.length; i++)
+			if (uses[i] == VoxelUses.AMMO)
+				ammoIndexesSet.add(i + 1);
+		int[] ammoIndexes = new int[ammoIndexesSet.size()];
+		int i = 0;
+		for (Integer integer : ammoIndexesSet)
+			ammoIndexes[i++] = integer;
 		nbt.setByteArray("voxels", voxels);
 		nbt.setInteger("max_ammo", (int) (stats.ammo));
 		nbt.setInteger("ammo", (int) (stats.ammo));
 		nbt.setInteger("fire_freq", (int) stats.fireRate);
 		nbt.setInteger("fireCount", (int) stats.fireRate);
 		nbt.setDouble("damage", stats.damage);
+		nbt.setIntArray("ammo_indexes", ammoIndexes);
+		nbt.setInteger("ammo_voxels", stats.ammoVoxels);
 
-		for (int i = 0; i < colors.length && i < uses.length; i++)
+		for (i = 0; i < colors.length && i < uses.length; i++)
 		{
 			nbt.setIntArray("color" + i, colors[i]);
-			if(uses[i] == VoxelUses.DAMAGE){
+			if (uses[i] == VoxelUses.DAMAGE)
+			{
 				nbt.setIntArray("damage_color", colors[i]);
-			} else if(uses[i] == VoxelUses.FIRE_RATE){
+			}
+			else if (uses[i] == VoxelUses.FIRE_RATE)
+			{
 				nbt.setIntArray("fire_rate_color", colors[i]);
 			}
 		}
 
-		if(nbt.getIntArray("fire_rate_color").length == 0)
+		if (nbt.getIntArray("fire_rate_color").length == 0)
 			nbt.setIntArray("fire_rate_color", nbt.getIntArray("damage_color"));
 
 		return nbt;
@@ -122,7 +137,7 @@ public class ItemPrintedGun extends Item
 				}
 			}
 
-			damage = 75*(((double) damageVoxels + 1.0) / (double) totalVoxels);
+			damage = 75 * (((double) damageVoxels + 1.0) / (double) totalVoxels);
 			ammo = (((double) ammoVoxels + 1.0) / (double) totalVoxels) * 200;
 			fireRate = 5.0 / (((double) fireRateVoxels + 1.0) / (double) totalVoxels);
 
@@ -193,9 +208,9 @@ public class ItemPrintedGun extends Item
 
 			int[] color1 = gunData.getIntArray("damage_color");
 			int[] color2 = gunData.getIntArray("fire_rate_color");
-			if(color1.length > 2)
+			if (color1.length > 2)
 				entityBullet.getDataManager().set(EntityBullet.COLOR1, new BlockPos(color1[0], color1[1], color1[2]));
-			if(color2.length > 2)
+			if (color2.length > 2)
 				entityBullet.getDataManager().set(EntityBullet.COLOR2, new BlockPos(color2[0], color2[1], color2[2]));
 
 			worldIn.playSound(null, player.posX, player.posY, player.posZ, StarTech.Sounds.shoot, SoundCategory.PLAYERS, 1.0f, new Random().nextFloat());
