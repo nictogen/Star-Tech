@@ -74,16 +74,15 @@ public class ItemPrintedGun extends Item
 		return nbt;
 	}
 
-	//TODO either cooldown or ammo as a gui (possibly both)
 	@Override public double getDurabilityForDisplay(ItemStack stack)
 	{
 		NBTTagCompound gunData = getGunData(stack);
-		return 1.0 - (double) gunData.getInteger("fireCount") / (double) gunData.getInteger("fire_freq");
+		return 1.0 - ((double) gunData.getInteger("ammo") / (double) gunData.getInteger("max_ammo"));
 	}
 
 	@Override public boolean showDurabilityBar(ItemStack stack)
 	{
-		return getDurabilityForDisplay(stack) != 0.0;
+		return true;
 	}
 
 	@Override public boolean isDamaged(ItemStack stack)

@@ -5,12 +5,11 @@ import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.client.*;
 import com.nic.st.client.gui.GuiEditCreatorButton;
+import com.nic.st.client.model.PrintedGunModel;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.entity.EntityItemIndestructibleST;
 import com.nic.st.items.ItemPrintedGun;
-import com.nic.st.power.AbilityPowerCyclone;
-import com.nic.st.power.EntityPowerRocket;
-import com.nic.st.power.PowerRocketRenderer;
+import com.nic.st.power.*;
 import com.nic.st.util.ClientUtils;
 import com.nic.st.util.LimbManipulationUtil;
 import lucraft.mods.lucraftcore.infinity.render.ItemRendererInfinityStone;
@@ -19,26 +18,29 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
@@ -62,13 +64,14 @@ import java.util.List;
  */
 public class ClientProxy extends CommonProxy
 {
+	public static final ResourceLocation SUPERPOWER_ICONS = new ResourceLocation(StarTech.MODID, "textures/superpower_icons.png");
+
 	@SubscribeEvent
 	public void onRenderPlayerPost(RenderPlayerEvent.Post event)
 	{
 		@SuppressWarnings("rawtypes") RenderLivingBase renderer = (RenderLivingBase) Minecraft
 				.getMinecraft().getRenderManager().getEntityRenderObject(event.getEntityPlayer());
-		List<LayerRenderer<AbstractClientPlayer>> layerList = ReflectionHelper
-				.getPrivateValue(RenderLivingBase.class, renderer, 4);
+		List<LayerRenderer<AbstractClientPlayer>> layerList = ReflectionHelper.getPrivateValue(RenderLivingBase.class, renderer, 4);
 		try
 		{
 			for (LayerRenderer<AbstractClientPlayer> layer : layerList)
@@ -121,6 +124,8 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityItemIndestructibleST.class, RenderEntityInfinityStone::new);
 		OBJLoader.INSTANCE.addDomain(StarTech.MODID);
 		MinecraftForge.EVENT_BUS.register(new AbilityPowerCyclone.ClientHandler());
+		MinecraftForge.EVENT_BUS.register(new PotionBurnout.ClientHandler());
+		MinecraftForge.EVENT_BUS.register(new ItemPowerStone.ClientHandler());
 	}
 
 	@Override public void init(FMLInitializationEvent event)
@@ -139,17 +144,23 @@ public class ClientProxy extends CommonProxy
 	@Override public void onLaserImpact(World world, double x, double y, double z, Color c)
 	{
 		BulletRenderer.Overlay particlefirework$overlay = new BulletRenderer.Overlay(world, x, y, z);
-		particlefirework$overlay.setRBGColorF(((float) c.getRed())/255f, ((float) c.getGreen())/255f, ((float) c.getBlue())/255f);
+		particlefirework$overlay.setRBGColorF(((float) c.getRed()) / 255f, ((float) c.getGreen()) / 255f, ((float) c.getBlue()) / 255f);
 		Minecraft.getMinecraft().effectRenderer.addEffect(particlefirework$overlay);
 
 		for (int i = 0; i < 5; i++)
 		{
-			Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.SMOKE_NORMAL.getParticleID(), x + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), y + world.rand.nextFloat() * 0.2, z + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), world.rand.nextGaussian()*0.05, 0.05, world.rand.nextGaussian()*0.05);
-			Particle p = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.FIREWORKS_SPARK.getParticleID(), x + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), y + world.rand.nextFloat() * 0.2, z + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), world.rand.nextGaussian()*0.05, 0.1, world.rand.nextGaussian()*0.05);
+			Minecraft.getMinecraft().effectRenderer
+					.spawnEffectParticle(EnumParticleTypes.SMOKE_NORMAL.getParticleID(), x + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1),
+							y + world.rand.nextFloat() * 0.2, z + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1),
+							world.rand.nextGaussian() * 0.05, 0.05, world.rand.nextGaussian() * 0.05);
+			Particle p = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.FIREWORKS_SPARK.getParticleID(),
+					x + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), y + world.rand.nextFloat() * 0.2,
+					z + world.rand.nextFloat() * 0.1 * (world.rand.nextBoolean() ? 1 : -1), world.rand.nextGaussian() * 0.05, 0.1,
+					world.rand.nextGaussian() * 0.05);
 
 			if (p != null)
 			{
-				p.setRBGColorF(1.0f,  1.0f, 1.0f);
+				p.setRBGColorF(1.0f, 1.0f, 1.0f);
 				p.multipleParticleScaleBy(0.2f);
 			}
 		}
@@ -188,6 +199,7 @@ public class ClientProxy extends CommonProxy
 			}
 		}
 		StarTech.Items.powerStone.setTileEntityItemStackRenderer(new ItemRendererInfinityStone(new Color(148, 0, 211), new Color(186, 85, 211)));
+		StarTech.Items.cosmiRod.setTileEntityItemStackRenderer(new ItemRendererCosmiRod());
 	}
 
 	@SubscribeEvent
@@ -251,18 +263,52 @@ public class ClientProxy extends CommonProxy
 			boolean b = false;
 			for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
 			{
-				if (buttonBox.offset(0.75 - i*0.1, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
+				if (buttonBox.offset(0.75 - i * 0.1, 0.15, -0.05).calculateIntercept(event.getEntityPlayer().getPositionEyes(0.0f), hitVec) != null)
 				{
 					Minecraft.getMinecraft().displayGuiScreen(new GuiEditCreatorButton(te.getPos(), i));
 					b = true;
 				}
 			}
-			if(!b) return;
+			if (!b)
+				return;
 			event.setCanceled(true);
 			te.markDirty();
 			IBlockState state = te.getWorld().getBlockState(te.getPos());
 			te.getWorld().notifyBlockUpdate(te.getPos(), state, state, 3);
 		}
 
+	}
+
+	@SubscribeEvent
+	public void onRenderGameOverlay(RenderGameOverlayEvent.Post event)
+	{
+		if (event.getType() != RenderGameOverlayEvent.ElementType.CROSSHAIRS)
+			return;
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.player == null) return;
+
+		int l = event.getResolution().getScaledWidth();
+		int i1 = event.getResolution().getScaledHeight();
+		renderGunCD(EnumHandSide.LEFT, l, i1, mc.player.getHeldItem(mc.player.getPrimaryHand() == EnumHandSide.LEFT ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND), event.getPartialTicks());
+		renderGunCD(EnumHandSide.RIGHT, l, i1, mc.player.getHeldItem(mc.player.getPrimaryHand() == EnumHandSide.RIGHT ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND), event.getPartialTicks());
+	}
+
+	public void renderGunCD(EnumHandSide side, int scaledWidth, int scaledHeight, ItemStack heldItem, float partialTicks){
+
+		if(!(heldItem.getItem() instanceof ItemPrintedGun)) return;
+		NBTTagCompound gunData = ItemPrintedGun.getGunData(heldItem);
+		float cd = (((float) gunData.getInteger("fireCount")) + partialTicks) / (float) gunData.getInteger("fire_freq");
+		int i = scaledHeight / 2 - 7 - 16;
+		int j = scaledWidth / 2;
+		j += (side == EnumHandSide.LEFT) ? -48 : 16;
+
+		GlStateManager.pushMatrix();
+		if (cd < 1.0F)
+		{
+			int k = (int) (cd * 17.0F);
+			Gui.drawScaledCustomSizeModalRect(j, i, 36, 94, 16, 4, 32, 8, 256, 256);
+			Gui.drawScaledCustomSizeModalRect(j, i, 52, 94, k, 4, k * 2, 8, 256, 256);
+		}
+		GlStateManager.popMatrix();
 	}
 }

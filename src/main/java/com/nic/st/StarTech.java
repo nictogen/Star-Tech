@@ -1,11 +1,13 @@
 package com.nic.st;
 
+import com.nic.st.abilities.AbilityConcussiveBlast;
 import com.nic.st.blocks.BlockBlueprintCreator;
 import com.nic.st.blocks.BlockHologram;
 import com.nic.st.blocks.BlockPrinter;
 import com.nic.st.entity.EntityBullet;
 import com.nic.st.entity.EntityItemIndestructibleST;
 import com.nic.st.items.ItemBlueprint;
+import com.nic.st.items.ItemCosmiRod;
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.network.MessageChangeVoxel;
 import com.nic.st.network.MessageMovePlayer;
@@ -45,12 +47,13 @@ public class StarTech
 {
 	public static final String MODID = "star-tech";
 	public static final String NAME = "Star Tech, Man! The Legendary Mod?";
-	public static final String VERSION = "1.0.1";
+	public static final String VERSION = "1.1";
 
 	@SidedProxy(clientSide = "com.nic.st.ClientProxy", serverSide = "com.nic.st.CommonProxy")
 	public static CommonProxy proxy;
 
 	public static SimpleNetworkWrapper simpleNetworkWrapper;
+
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event)
 	{
@@ -63,14 +66,19 @@ public class StarTech
 	public static void registerEntityEntry(RegistryEvent.Register<EntityEntry> event)
 	{
 		event.getRegistry().register(
-				EntityEntryBuilder.create().entity(EntityBullet.class).id(new ResourceLocation(MODID, "bullet"), 0).name("bullet").tracker(80, 10, true)
-						.build());
-		event.getRegistry().register(
-				EntityEntryBuilder.create().entity(EntityPowerRocket.class).id(new ResourceLocation(MODID, "power_rocket"), 1).name("power_rocket")
+				EntityEntryBuilder.create().entity(EntityBullet.class)
+						.id(new ResourceLocation(MODID, "bullet"), 0).name("bullet")
 						.tracker(80, 10, true)
 						.build());
 		event.getRegistry().register(
-				EntityEntryBuilder.create().entity(EntityItemIndestructibleST.class).id(new ResourceLocation(MODID, "indestructible_item"), 2).name("indestructible_item").tracker(80, 10, true)
+				EntityEntryBuilder.create().entity(EntityPowerRocket.class)
+						.id(new ResourceLocation(MODID, "power_rocket"), 1).name("power_rocket")
+						.tracker(80, 10, true)
+						.build());
+		event.getRegistry().register(
+				EntityEntryBuilder.create().entity(EntityItemIndestructibleST.class)
+						.id(new ResourceLocation(MODID, "indestructible_item"), 2).name("indestructible_item")
+						.tracker(80, 10, true)
 						.build());
 	}
 
@@ -82,7 +90,8 @@ public class StarTech
 		e.getRegistry().register(new AbilityEntry(AbilityPowerBlast.class, new ResourceLocation(MODID, "power_blast")));
 		e.getRegistry().register(new AbilityEntry(AbilityPowerImpower.class, new ResourceLocation(MODID, "power_impower")));
 		e.getRegistry().register(new AbilityEntry(AbilityRocketBurst.class, new ResourceLocation(MODID, "power_rocket_burst")));
-
+		e.getRegistry().register(new AbilityEntry(AbilityGiveBurnout.class, new ResourceLocation(MODID, "power_give_burnout")));
+		e.getRegistry().register(new AbilityEntry(AbilityConcussiveBlast.class, new ResourceLocation(MODID, "concussive_blast")));
 	}
 
 
@@ -92,6 +101,7 @@ public class StarTech
 		event.getRegistry().register(new ItemPrintedGun());
 		event.getRegistry().register(new ItemBlueprint());
 		event.getRegistry().register(new ItemPowerStone());
+		event.getRegistry().register(new ItemCosmiRod());
 
 		for (Field field : Blocks.class.getDeclaredFields())
 		{
@@ -123,8 +133,8 @@ public class StarTech
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
-		GameRegistry.registerTileEntity(BlockBlueprintCreator.TileEntityBlueprintCreator.class, "star-tech:blueprint_creator");
-		GameRegistry.registerTileEntity(BlockPrinter.TileEntityPrinter.class, "star-tech:printer");
+		GameRegistry.registerTileEntity(BlockBlueprintCreator.TileEntityBlueprintCreator.class, new ResourceLocation("star-tech:blueprint_creator"));
+		GameRegistry.registerTileEntity(BlockPrinter.TileEntityPrinter.class, new ResourceLocation("star-tech:printer"));
 		proxy.init(event);
 	}
 
@@ -167,6 +177,9 @@ public class StarTech
 
 		@GameRegistry.ObjectHolder("power_stone")
 		public static final Item powerStone = null;
+
+		@GameRegistry.ObjectHolder("cosmi_rod")
+		public static final Item cosmiRod = null;
 	}
 
 	public static class Sounds

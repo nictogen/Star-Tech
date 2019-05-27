@@ -1,13 +1,18 @@
 package com.nic.st.power;
 
+import com.nic.st.ClientProxy;
 import com.nic.st.client.ParticleColoredCloudOld;
 import lucraft.mods.lucraftcore.superpowers.abilities.AbilityToggle;
 import lucraft.mods.lucraftcore.util.helper.PlayerHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 import java.util.UUID;
@@ -62,6 +67,13 @@ public class AbilityPowerImpower extends AbilityToggle
 			}
 			return true;
 		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override public void drawIcon(Minecraft mc, Gui gui, int x, int y)
+	{
+		mc.renderEngine.bindTexture(ClientProxy.SUPERPOWER_ICONS);
+		gui.drawTexturedModalRect(x, y, (mc.player == null || !mc.player.isSneaking()) ? 3 * 16 : 4 * 16, 0, 16, 16);
 	}
 
 	@Override public boolean isEnabled()

@@ -6,4 +6,4 @@ tile.hologram.name=Hologram
 entity.bullet.name=Space Bullet Pow Shicka Wow
 item.blueprint.name=Blueprint
 item.printed_gun.name=3D Printed Space Gun!
-star-tech.notenoughstructure=Structure voxels must make up at least 25% of your weapon.
+star-tech.notenoughstructure=Structure voxels must make up at least 1/4 of your weapon.

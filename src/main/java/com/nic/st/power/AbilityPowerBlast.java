@@ -1,14 +1,19 @@
 package com.nic.st.power;
 
+import com.nic.st.ClientProxy;
 import com.nic.st.StarTech;
 import com.nic.st.util.ExplosionUtil;
 import com.nic.st.util.Utils;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
 import lucraft.mods.lucraftcore.superpowers.abilities.AbilityHeld;
+import lucraft.mods.lucraftcore.superpowers.abilities.data.AbilityData;
+import lucraft.mods.lucraftcore.superpowers.abilities.data.AbilityDataInteger;
+import lucraft.mods.lucraftcore.superpowers.abilities.supplier.EnumSync;
 import lucraft.mods.lucraftcore.superpowers.render.RenderSuperpowerLayerEvent;
 import lucraft.mods.lucraftcore.util.helper.LCRenderHelper;
 import lucraft.mods.lucraftcore.util.helper.PlayerHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
@@ -31,10 +36,62 @@ import java.util.ArrayList;
  */
 public class AbilityPowerBlast extends AbilityHeld
 {
+
+	public static final AbilityData<Integer> DURATION = new AbilityDataInteger("duration").disableSaving().setSyncType(EnumSync.SELF)
+			.enableSetting("duration", "How long the beam is fired for.");
+
 	//TODO non-player rendering
 	public AbilityPowerBlast(EntityLivingBase player)
 	{
 		super(player);
+	}
+
+
+	@Override
+	public void onUpdate() {
+		if (isUnlocked()) {
+			if (isEnabled()) {
+				if (ticks == 0)
+					firstTick();
+				ticks++;
+				updateTick();
+
+			} else {
+				if (ticks != 0) {
+					lastTick();
+					ticks = 0;
+				}
+
+				if (hasCooldown()) {
+					if (getCooldown() > 0)
+						this.setCooldown(getCooldown() - 1);
+				}
+			}
+		} else if (ticks != 0) {
+			lastTick();
+			ticks = 0;
+		}
+
+		if (this.dataManager.sync != null) {
+			this.sync = this.sync.add(this.dataManager.sync);
+			this.dataManager.sync = EnumSync.NONE;
+		}
+	}
+
+	@Override public void registerData()
+	{
+		super.registerData();
+		this.dataManager.register(DURATION, 10);
+	}
+
+	@Override public void onKeyPressed()
+	{
+		if (!this.isCoolingdown())
+			super.onKeyPressed();
+	}
+
+	@Override public void onKeyReleased()
+	{
 	}
 
 	@Override public void updateTick()
@@ -49,8 +106,10 @@ public class AbilityPowerBlast extends AbilityHeld
 		{
 			for (int i = 0; i < 5; i++)
 			{
-				Vec3d d = result.hitVec.subtract(entity.getLookVec().normalize()).add(entity.getRNG().nextGaussian() * 0.5, entity.getRNG().nextGaussian() * 0.5, entity.getRNG().nextGaussian() * 0.5);
-				Particle p = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(EnumParticleTypes.EXPLOSION_LARGE.getParticleID(), d.x, d.y, d.z, 0, 0.0, 0);
+				Vec3d d = result.hitVec.subtract(entity.getLookVec().normalize())
+						.add(entity.getRNG().nextGaussian() * 0.5, entity.getRNG().nextGaussian() * 0.5, entity.getRNG().nextGaussian() * 0.5);
+				Particle p = Minecraft.getMinecraft().effectRenderer
+						.spawnEffectParticle(EnumParticleTypes.EXPLOSION_LARGE.getParticleID(), d.x, d.y, d.z, 0, 0.0, 0);
 				if (p != null)
 				{
 
@@ -67,6 +126,18 @@ public class AbilityPowerBlast extends AbilityHeld
 				}
 			}
 		}
+		if (this.ticks == this.dataManager.get(DURATION))
+		{
+			this.setEnabled(false);
+			this.setCooldown(this.getMaxCooldown());
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override public void drawIcon(Minecraft mc, Gui gui, int x, int y)
+	{
+		mc.renderEngine.bindTexture(ClientProxy.SUPERPOWER_ICONS);
+		gui.drawTexturedModalRect(x, y, 2 * 16, 0, 16, 16);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -133,7 +204,8 @@ public class AbilityPowerBlast extends AbilityHeld
 					LCRenderHelper.setupRenderLightning();
 					e.getRenderPlayer().getMainModel().bipedHead.postRender(e.getScale());
 					{
-						Vec3d start = new Vec3d(-0.2F, 10F * e.getScale(), 1);
+						Vec3d start =
+								ab.context == EnumAbilityContext.OFF_HAND ? new Vec3d(0.3F, 10F * e.getScale(), 1) : new Vec3d(-0.3F, 10F * e.getScale(), 1);
 						Vec3d end = start.add(0, 10F * e.getScale(), -distance);
 						LCRenderHelper.drawGlowingLine(start, end, 0.5F, c);
 					}

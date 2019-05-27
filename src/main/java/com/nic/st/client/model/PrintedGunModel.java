@@ -1,4 +1,4 @@
-package com.nic.st.client;
+package com.nic.st.client.model;
 
 import com.nic.st.items.ItemPrintedGun;
 import com.nic.st.util.ClientUtils;

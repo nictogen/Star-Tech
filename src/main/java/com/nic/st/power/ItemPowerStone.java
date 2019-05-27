@@ -7,6 +7,9 @@ import lucraft.mods.lucraftcore.infinity.EnumInfinityStone;
 import lucraft.mods.lucraftcore.infinity.items.ItemInfinityStone;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
 import lucraft.mods.lucraftcore.superpowers.abilities.supplier.IAbilityProvider;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,6 +19,12 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
@@ -73,9 +82,9 @@ public class ItemPowerStone extends ItemInfinityStone implements IAbilityProvide
 
 	@Override public Ability.AbilityMap addStoneAbilities(EntityLivingBase entity, Ability.AbilityMap abilities, Ability.EnumAbilityContext context)
 	{
-		abilities.put("power_blast", new AbilityPowerBlast(entity));
+		abilities.put("power_blast", new AbilityPowerBlast(entity).setMaxCooldown(100));
 		abilities.put("power_impower", new AbilityPowerImpower(entity));
-		abilities.put("power_rocket_burst", new AbilityRocketBurst(entity));
+		abilities.put("power_rocket_burst", new AbilityRocketBurst(entity).setMaxCooldown(100));
 		return super.addStoneAbilities(entity, abilities, context);
 	}
 
@@ -83,6 +92,57 @@ public class ItemPowerStone extends ItemInfinityStone implements IAbilityProvide
 	{
 		abilities.put("power_tendrils", new AbilityTendrils(entity));
 		abilities.put("power_cyclone", new AbilityPowerCyclone(entity));
+		abilities.put("power_burnout", new AbilityGiveBurnout(entity));
 		return abilities;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class ClientHandler
+	{
+		@SubscribeEvent(receiveCanceled = true)
+		public void onInput(InputEvent event)
+		{
+			turnOffKeys();
+		}
+
+		@SubscribeEvent(receiveCanceled = true)
+		public void onInput(TickEvent.ClientTickEvent event)
+		{
+			turnOffKeys();
+		}
+
+		private void turnOffKeys()
+		{
+			GameSettings s = Minecraft.getMinecraft().gameSettings;
+			EntityPlayer player = Minecraft.getMinecraft().player;
+			if (player != null && (player.getHeldItemMainhand().getItem() instanceof ItemPowerStone || player.getHeldItemOffhand().getItem() instanceof ItemPowerStone))
+			{
+				KeyBinding.setKeyBindState(s.keyBindForward.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindBack.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindLeft.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindRight.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindJump.getKeyCode(), false);
+
+				if (!Minecraft.getMinecraft().player.isCreative() && Minecraft.getMinecraft().player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
+					for (int i = 0; i < s.keyBindsHotbar.length; i++)
+					{
+						if (s.keyBindsHotbar[i].isPressed())
+						{
+							KeyBinding.setKeyBindState(s.keyBindsHotbar[i].getKeyCode(), false);
+						}
+					}
+			}
+		}
+
+		@SubscribeEvent
+		public void onMouse(MouseEvent event)
+		{
+			EntityPlayer player = Minecraft.getMinecraft().player;
+			if (player == null || player.isCreative() || event.getDwheel() == 0 || !(player.getHeldItemMainhand().getItem() instanceof ItemPowerStone))
+				return;
+			event.setCanceled(true);
+		}
+
+
 	}
 }
