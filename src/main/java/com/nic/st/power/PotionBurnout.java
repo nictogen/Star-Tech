@@ -1,18 +1,17 @@
 package com.nic.st.power;
 
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.nic.st.ClientProxy;
 import com.nic.st.StarTech;
 import com.nic.st.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,7 +23,6 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -34,7 +32,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -53,12 +50,17 @@ public class PotionBurnout extends Potion
 
 	public static PotionBurnout POTION_BURNOUT = new PotionBurnout();
 
-	public static void giveBurnout(EntityLivingBase entityLivingBase) {
-		int duration = (entityLivingBase.isPotionActive(PotionBurnout.POTION_BURNOUT)) ? entityLivingBase.getActivePotionEffect(PotionBurnout.POTION_BURNOUT).getDuration() + 2 : 2;
-		entityLivingBase.addPotionEffect(new PotionEffect(PotionBurnout.POTION_BURNOUT, duration, duration / 10, false, !(entityLivingBase instanceof EntityPlayer)));
-		if(entityLivingBase.getMaxHealth() <= 0.1)
+	public static void giveBurnout(EntityLivingBase entityLivingBase)
+	{
+		int duration = (entityLivingBase.isPotionActive(PotionBurnout.POTION_BURNOUT)) ?
+				entityLivingBase.getActivePotionEffect(PotionBurnout.POTION_BURNOUT).getDuration() + 2 :
+				2;
+		entityLivingBase
+				.addPotionEffect(new PotionEffect(PotionBurnout.POTION_BURNOUT, duration, duration / 10, false, !(entityLivingBase instanceof EntityPlayer)));
+		if (entityLivingBase.getMaxHealth() <= 0.1)
 		{
-			if(entityLivingBase instanceof EntityPlayer && ((EntityPlayer) entityLivingBase).capabilities.isCreativeMode) return;
+			if (entityLivingBase instanceof EntityPlayer && ((EntityPlayer) entityLivingBase).capabilities.isCreativeMode)
+				return;
 			entityLivingBase.world.createExplosion(null, entityLivingBase.posX, entityLivingBase.posY, entityLivingBase.posZ, 3.0f, true);
 		}
 	}
@@ -73,29 +75,34 @@ public class PotionBurnout extends Potion
 		super.performEffect(entityLivingBaseIn, amplifier);
 		int duration = entityLivingBaseIn.getActivePotionEffect(POTION_BURNOUT).getDuration();
 		entityLivingBaseIn.removePotionEffect(POTION_BURNOUT);
-		entityLivingBaseIn.addPotionEffect(new PotionEffect(PotionBurnout.POTION_BURNOUT, duration, duration / 10, false, !(entityLivingBaseIn instanceof EntityPlayer)));
+		entityLivingBaseIn
+				.addPotionEffect(new PotionEffect(PotionBurnout.POTION_BURNOUT, duration, duration / 10, false, !(entityLivingBaseIn instanceof EntityPlayer)));
 	}
 
 	@SubscribeEvent
-	public static void onRegisterPotions(RegistryEvent.Register<Potion> e) {
+	public static void onRegisterPotions(RegistryEvent.Register<Potion> e)
+	{
 		e.getRegistry().register(POTION_BURNOUT);
 	}
 
 	@Override
-	public boolean shouldRender(PotionEffect effect) {
+	public boolean shouldRender(PotionEffect effect)
+	{
 		return false;
 	}
 
 	@Override
-	public boolean hasStatusIcon() {
+	public boolean hasStatusIcon()
+	{
 		return false;
 	}
-
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void renderInventoryEffect(PotionEffect effect, Gui gui, int x, int y, float z) {
-		if (effect.getPotion() == this) {
+	public void renderInventoryEffect(PotionEffect effect, Gui gui, int x, int y, float z)
+	{
+		if (effect.getPotion() == this)
+		{
 			GlStateManager.pushMatrix();
 			GlStateManager.enableBlend();
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -108,8 +115,10 @@ public class PotionBurnout extends Potion
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void renderHUDEffect(PotionEffect effect, Gui gui, int x, int y, float z, float alpha) {
-		if (effect.getPotion() == this) {
+	public void renderHUDEffect(PotionEffect effect, Gui gui, int x, int y, float z, float alpha)
+	{
+		if (effect.getPotion() == this)
+		{
 			GlStateManager.pushMatrix();
 			GlStateManager.enableBlend();
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -120,20 +129,18 @@ public class PotionBurnout extends Potion
 		}
 	}
 
-
 	@SideOnly(Side.CLIENT)
 	public static class ClientHandler
 	{
 		private static final ResourceLocation POWER_BACKGROUND = new ResourceLocation(StarTech.MODID, "textures/power_background.png");
 		public static DynamicTexture extendedTexture = null;
 		public static DynamicTexture glowingTexture = null;
-		private static ResourceLocation skin = null;
-		private static DynamicTexture replacementTexture = null;
+		public static DynamicTexture replacementTexture = null;
 		private static ArrayList<EntityPlayer> layersAddedTo = new ArrayList<>();
 		private static World lastWorld = null;
 
 		@SubscribeEvent
-		public void onRenderPlayerPre(RenderPlayerEvent.Pre event) throws IOException, IllegalAccessException
+		public void onRenderPlayerPre(RenderPlayerEvent.Pre event) throws IOException
 		{
 			if (lastWorld != event.getEntityPlayer().world)
 			{
@@ -146,19 +153,15 @@ public class PotionBurnout extends Potion
 				event.getRenderer().addLayer(new PowerPlayerLayerRenderer(event.getRenderer()));
 			}
 
-			if(event.getEntityLiving().isPotionActive(POTION_BURNOUT)){
+			if (event.getEntityLiving().isPotionActive(POTION_BURNOUT))
+			{
 				PotionEffect e = event.getEntityLiving().getActivePotionEffect(POTION_BURNOUT);
 				double progress = ((double) e.getDuration()) / (double) (event.getEntityLiving().getMaxHealth() + e.getAmplifier()) * 175.0;
 				if (progress > 0)
 				{
-					TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
-					IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-					NetworkPlayerInfo info = ReflectionHelper
-							.getPrivateValue(AbstractClientPlayer.class, (AbstractClientPlayer) event.getEntityPlayer(), 0);
-
-					skin = info.getLocationSkin();
-					BufferedImage replacementImage = TextureUtil.readBufferedImage(resourceManager.getResource(skin).getInputStream());
-					BufferedImage powerImage = TextureUtil.readBufferedImage(resourceManager.getResource(POWER_BACKGROUND).getInputStream());
+					BufferedImage replacementImage = cloneSkin(getPlayerSkin((AbstractClientPlayer) event.getEntityPlayer()));
+					BufferedImage powerImage = TextureUtil
+							.readBufferedImage(Minecraft.getMinecraft().getResourceManager().getResource(POWER_BACKGROUND).getInputStream());
 					BufferedImage extendedImage = new BufferedImage(replacementImage.getWidth(), replacementImage.getHeight(),
 							BufferedImage.TYPE_INT_ARGB);
 					BufferedImage glowingImage = new BufferedImage(replacementImage.getWidth(), replacementImage.getHeight(),
@@ -193,30 +196,54 @@ public class PotionBurnout extends Potion
 					replacementTexture = new DynamicTexture(replacementImage);
 					extendedTexture = new DynamicTexture(extendedImage);
 					glowingTexture = new DynamicTexture(glowingImage);
+				}
+			}
+		}
 
-					Field textureMap = NetworkPlayerInfo.class.getDeclaredFields()[1];
-					textureMap.setAccessible(true);
-					Map<MinecraftProfileTexture.Type, ResourceLocation> playerTextures = (Map<MinecraftProfileTexture.Type, ResourceLocation>) textureMap.get(info);
-					playerTextures.put(MinecraftProfileTexture.Type.SKIN, textureManager.getDynamicTextureLocation("power_skin", replacementTexture));
+		public BufferedImage cloneSkin(BufferedImage originalImage)
+		{
+			BufferedImage image = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), originalImage.getType());
+			for (int x = 0; x < image.getWidth(); x++)
+				for (int y = 0; y < image.getHeight(); y++)
+					image.setRGB(x, y, originalImage.getRGB(x, y));
+			return image;
+		}
+
+		public static BufferedImage getPlayerSkin(AbstractClientPlayer player)
+		{
+			try
+			{
+				ThreadDownloadImageData t = (ThreadDownloadImageData) Minecraft.getMinecraft().getTextureManager().getTexture(player.getLocationSkin());
+				Field f = ThreadDownloadImageData.class.getDeclaredFields()[5];
+				f.setAccessible(true);
+				return (BufferedImage) f.get(t);
+			}
+			catch (IllegalAccessException e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+			catch (ClassCastException e)
+			{
+				try
+				{
+					SimpleTexture t = (SimpleTexture) Minecraft.getMinecraft().getTextureManager().getTexture(player.getLocationSkin());
+					Field f = SimpleTexture.class.getDeclaredFields()[1];
+					f.setAccessible(true);
+					IResource iresource = Minecraft.getMinecraft().getResourceManager().getResource((ResourceLocation) f.get(t));
+					return TextureUtil.readBufferedImage(iresource.getInputStream());
+				}
+				catch (IOException | IllegalAccessException e2)
+				{
+					e2.printStackTrace();
+					return null;
 				}
 			}
 		}
 
 		@SubscribeEvent
-		public void onRenderPlayerPost(RenderPlayerEvent.Post event) throws IllegalAccessException
+		public void onRenderPlayerPost(RenderPlayerEvent.Post event)
 		{
-
-			if (skin != null)
-			{
-				NetworkPlayerInfo info = ReflectionHelper.getPrivateValue(AbstractClientPlayer.class, (AbstractClientPlayer) event.getEntityPlayer(), 0);
-				Field textureMap = NetworkPlayerInfo.class.getDeclaredFields()[1];
-				textureMap.setAccessible(true);
-				Map<MinecraftProfileTexture.Type, ResourceLocation> playerTextures = (Map<MinecraftProfileTexture.Type, ResourceLocation>) textureMap.get(info);
-				Minecraft.getMinecraft().getTextureManager().deleteTexture(playerTextures.get(MinecraftProfileTexture.Type.SKIN));
-				playerTextures.put(MinecraftProfileTexture.Type.SKIN, skin);
-				skin = null;
-			}
-
 			if (replacementTexture != null)
 			{
 				replacementTexture.deleteGlTexture();

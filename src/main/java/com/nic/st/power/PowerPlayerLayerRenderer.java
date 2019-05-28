@@ -2,12 +2,16 @@ package com.nic.st.power;
 
 import com.nic.st.util.ClientUtils;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
+import lucraft.mods.lucraftcore.util.events.RenderModelEvent;
 import lucraft.mods.lucraftcore.util.helper.LCRenderHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -108,6 +112,21 @@ public class PowerPlayerLayerRenderer implements LayerRenderer<EntityPlayer>
 			this.biggerModel.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 			manager.deleteTexture(texLoc);
 			GlStateManager.popMatrix();
+		}
+	}
+
+	@SubscribeEvent
+	public static void onSetRotationAngles(RenderModelEvent.SetRotationAngels event)
+	{
+		if (event.type != RenderModelEvent.ModelSetRotationAnglesEventType.PRE || !(event.getEntity() instanceof AbstractClientPlayer))
+			return;
+		Render r = Minecraft.getMinecraft().getRenderManager().getEntityRenderObject(event.getEntity());
+		if (!(r instanceof RenderLivingBase) || event.model != ((RenderLivingBase) r).getMainModel())
+			return;
+
+		if(PotionBurnout.ClientHandler.replacementTexture != null){
+			ResourceLocation texLoc = Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation("replacement_skin", PotionBurnout.ClientHandler.replacementTexture);
+			Minecraft.getMinecraft().renderEngine.bindTexture(texLoc);
 		}
 	}
 
