@@ -119,11 +119,14 @@ public class ItemPowerStone extends ItemInfinityStone implements IAbilityProvide
 			EntityPlayer player = Minecraft.getMinecraft().player;
 			if (player != null && (player.getHeldItemMainhand().getItem() instanceof ItemPowerStone || player.getHeldItemOffhand().getItem() instanceof ItemPowerStone))
 			{
+				Minecraft.getMinecraft().displayGuiScreen(null);
 				KeyBinding.setKeyBindState(s.keyBindForward.getKeyCode(), false);
 				KeyBinding.setKeyBindState(s.keyBindBack.getKeyCode(), false);
 				KeyBinding.setKeyBindState(s.keyBindLeft.getKeyCode(), false);
 				KeyBinding.setKeyBindState(s.keyBindRight.getKeyCode(), false);
 				KeyBinding.setKeyBindState(s.keyBindJump.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindInventory.getKeyCode(), false);
+				KeyBinding.setKeyBindState(s.keyBindDrop.getKeyCode(), false);
 
 				if (!Minecraft.getMinecraft().player.isCreative() && Minecraft.getMinecraft().player.getHeldItemMainhand().getItem() instanceof ItemPowerStone)
 					for (int i = 0; i < s.keyBindsHotbar.length; i++)
@@ -143,6 +146,7 @@ public class ItemPowerStone extends ItemInfinityStone implements IAbilityProvide
 			if (player == null || player.isCreative() || event.getDwheel() == 0 || !(player.getHeldItemMainhand().getItem() instanceof ItemPowerStone))
 				return;
 			event.setCanceled(true);
+			Minecraft.getMinecraft().displayGuiScreen(null);
 		}
 
 

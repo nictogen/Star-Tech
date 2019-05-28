@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "1.1.1"
+version = "1.1.2"
 group = "com.nic.star-tech" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "star-tech"
 
@@ -22,7 +22,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.5.2796"
+    version = "1.12.2-14.23.5.2816"
     runDir = "run"
     mappings = "snapshot_20180814"
 }

@@ -57,7 +57,7 @@ public class PotionBurnout extends Potion
 				2;
 		entityLivingBase
 				.addPotionEffect(new PotionEffect(PotionBurnout.POTION_BURNOUT, duration, duration / 10, false, !(entityLivingBase instanceof EntityPlayer)));
-		if (entityLivingBase.getMaxHealth() <= 0.1)
+		if (entityLivingBase.getMaxHealth() <= 0.1 && !entityLivingBase.isDead)
 		{
 			if (entityLivingBase instanceof EntityPlayer && ((EntityPlayer) entityLivingBase).capabilities.isCreativeMode)
 				return;
