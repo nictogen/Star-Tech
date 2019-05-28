@@ -1,6 +1,10 @@
 {
   "forge_marker": 1,
   "variants": {
+    "inventory": {
+      "model": "star-tech:printer_empty.obj",
+      "y": 180
+    },
     "empty=false,facing=east": {
       "model": "star-tech:printer.obj",
       "y": 270

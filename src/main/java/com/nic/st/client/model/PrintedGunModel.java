@@ -160,7 +160,6 @@ public class PrintedGunModel implements IBakedModel
 
 	public static class PrintedGunColorizer implements IItemColor
 	{
-		//TODO check how much darker
 		@Override public int colorMultiplier(ItemStack stack, int tintIndex)
 		{
 			boolean darker = false;

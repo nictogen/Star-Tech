@@ -1,9 +1,28 @@
 {
   "variants": {
-    "normal": {
+    "inventory": {
       "model": "star-tech:blueprint_creator.obj"
     },
-    "inventory": {
+    "facing=east": {
+      "model": "star-tech:blueprint_creator.obj",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "star-tech:blueprint_creator.obj",
+      "y": 0
+    },
+    "facing=west": {
+      "model": "star-tech:blueprint_creator.obj",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "star-tech:blueprint_creator.obj",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "star-tech:blueprint_creator.obj"
+    },
+    "facing=down": {
       "model": "star-tech:blueprint_creator.obj"
     }
   }

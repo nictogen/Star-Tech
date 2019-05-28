@@ -4,6 +4,7 @@ import com.nic.st.StarTech;
 import com.nic.st.entity.EntityItemIndestructibleST;
 import lucraft.mods.lucraftcore.infinity.EntityItemIndestructible;
 import lucraft.mods.lucraftcore.infinity.EnumInfinityStone;
+import lucraft.mods.lucraftcore.infinity.ModuleInfinity;
 import lucraft.mods.lucraftcore.infinity.items.ItemInfinityStone;
 import lucraft.mods.lucraftcore.superpowers.abilities.Ability;
 import lucraft.mods.lucraftcore.superpowers.abilities.supplier.IAbilityProvider;
@@ -38,6 +39,7 @@ public class ItemPowerStone extends ItemInfinityStone implements IAbilityProvide
 		setRegistryName(StarTech.MODID, "power_stone");
 		setTranslationKey("power_stone");
 		setMaxStackSize(1);
+		setCreativeTab(ModuleInfinity.TAB);
 	}
 
 	@Override public EnumInfinityStone getType()

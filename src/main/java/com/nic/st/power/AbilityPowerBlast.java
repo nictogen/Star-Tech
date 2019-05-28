@@ -102,7 +102,7 @@ public class AbilityPowerBlast extends AbilityHeld
 			ArrayList<BlockPos> affectedBlocks = new ArrayList<>();
 			ExplosionUtil.doExplosionA(entity.world, entity, result.hitVec.x, result.hitVec.y, result.hitVec.z, affectedBlocks);
 		}
-		else
+		else if(entity.world.isRemote)
 		{
 			for (int i = 0; i < 5; i++)
 			{

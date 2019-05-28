@@ -231,7 +231,7 @@ public class BlockPrinter extends Block
 			}
 			else if (ticks > 0 && getWorld().isBlockPowered(getPos()) && blueprint.getItem() instanceof ItemBlueprint)
 			{
-				ticks += 500;
+				ticks += 5;
 				byte[] blueprintArray = blueprint.getTagCompound().getByteArray("voxels");
 				byte[] newArray = new byte[blueprintArray.length];
 				for (int i = blueprintArray.length - 1, n = 0; ticks >= n * 200 && i >= 0; i--)

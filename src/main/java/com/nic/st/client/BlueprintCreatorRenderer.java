@@ -33,6 +33,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 	@Override
 	public void render(BlockBlueprintCreator.TileEntityBlueprintCreator te, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
 	{
+
 		Tessellator tessellator = Tessellator.getInstance();
 
 		AxisAlignedBB creatorBox = new AxisAlignedBB(0.1, 0, 0.1, 0.9, 1, 0.9).offset(te.getPos());
@@ -61,6 +62,12 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(te.getPos().getX() + 0.75, te.getPos().getY() + 0.2, te.getPos().getZ() - 0.3);
 		GlStateManager.rotate(20f, 1, 0, 0);
+
+
+
+
+
+
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 
 		for (int i = 0; i < BlockBlueprintCreator.TileEntityBlueprintCreator.VOXEL_TYPES; i++)
@@ -77,6 +84,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		//Voxels
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(te.getPos().getX(), te.getPos().getY() + 1.5f, te.getPos().getZ() + 0.25);
+
 		if (!quadCache.containsKey(te) || !te.useCachedModel)
 		{
 			quadCache.put(te, ClientUtils.createQuads(te.voxels, 1024, new int[]{}));
@@ -136,6 +144,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 
 		GlStateManager.pushAttrib();
 		GlStateManager.disableTexture2D();
+		GlStateManager.pushMatrix();
 
 		GlStateManager.enableAlpha();
 		GlStateManager.enableBlend();
@@ -157,6 +166,7 @@ public class BlueprintCreatorRenderer extends TileEntitySpecialRenderer<BlockBlu
 		bufferbuilder.pos(holobox.maxX, holobox.minY, holobox.minZ).color(0.0f, 0.0f, 0.75f, 0.75f).endVertex();
 		tessellator.draw();
 
+		GlStateManager.popMatrix();
 		GlStateManager.disableBlend();
 		GlStateManager.enableTexture2D();
 

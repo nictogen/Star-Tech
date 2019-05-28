@@ -41,13 +41,15 @@ import java.lang.reflect.Field;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Mod(modid = StarTech.MODID, name = StarTech.NAME, version = StarTech.VERSION)
+@Mod(modid = StarTech.MODID, name = StarTech.NAME, version = StarTech.VERSION, dependencies = StarTech.DEPENDENCIES)
 @Mod.EventBusSubscriber
 public class StarTech
 {
 	public static final String MODID = "star-tech";
 	public static final String NAME = "Star Tech, Man! The Legendary Mod?";
 	public static final String VERSION = "1.1";
+	public static final String DEPENDENCIES = "required-after:lucraftcore@[1.12.2-2.4.3,);";
+
 
 	@SidedProxy(clientSide = "com.nic.st.ClientProxy", serverSide = "com.nic.st.CommonProxy")
 	public static CommonProxy proxy;
