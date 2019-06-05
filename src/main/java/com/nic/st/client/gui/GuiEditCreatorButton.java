@@ -65,10 +65,7 @@ public class GuiEditCreatorButton extends GuiContainer
 			usage.displayString = ((BlockBlueprintCreator.TileEntityBlueprintCreator) te).uses[button].name;
 		}
 
-
 	}
-
-
 
 	@Override public void initGui()
 	{
@@ -111,7 +108,8 @@ public class GuiEditCreatorButton extends GuiContainer
 		usage.drawButton(mc, mouseX, mouseY, mc.getRenderPartialTicks());
 
 		GlStateManager.disableTexture2D();
-		GlStateManager.color((float) Integer.parseInt(red.getText()) / 255f, (float) Integer.parseInt(green.getText()) / 255f, (float) Integer.parseInt(blue.getText()) / 255f);
+		GlStateManager.color((float) Integer.parseInt(red.getText()) / 255f, (float) Integer.parseInt(green.getText()) / 255f,
+				(float) Integer.parseInt(blue.getText()) / 255f);
 		this.drawTexturedModalRect(i - 10, j + 90, 0, 0, 200, 5);
 		GlStateManager.enableTexture2D();
 	}
@@ -130,9 +128,10 @@ public class GuiEditCreatorButton extends GuiContainer
 	@Override protected void actionPerformed(GuiButton button) throws IOException
 	{
 		super.actionPerformed(button);
-		if(button == usage){
+		if (button == usage)
+		{
 			usageIndex++;
-			if(usageIndex >= ItemPrintedGun.VoxelUses.values().length)
+			if (usageIndex >= ItemPrintedGun.VoxelUses.values().length)
 				usageIndex = 0;
 			button.displayString = ItemPrintedGun.VoxelUses.values()[usageIndex].name;
 			StarTech.simpleNetworkWrapper.sendToServer(
@@ -145,31 +144,34 @@ public class GuiEditCreatorButton extends GuiContainer
 	@Override protected void keyTyped(char typedChar, int keyCode) throws IOException
 	{
 		super.keyTyped(typedChar, keyCode);
+		typeInBox(red, typedChar, keyCode);
+		typeInBox(green, typedChar, keyCode);
+		typeInBox(blue, typedChar, keyCode);
 
-		char[] allowed = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '\u007F' };
-		for (char number : allowed)
-		{
-			if (typedChar == number)
-			{
-				typeInBox(red, typedChar, keyCode);
-				typeInBox(green, typedChar, keyCode);
-				typeInBox(blue, typedChar, keyCode);
-			}
-		}
 	}
 
 	private void typeInBox(GuiTextField box, char typedChar, int keyCode)
 	{
 		if (box != null)
 		{
+			String s = box.getText();
 			box.textboxKeyTyped(typedChar, keyCode);
+
+			int text = 0;
 			if (!box.getText().isEmpty())
 			{
-				int text = Integer.parseInt(box.getText());
-				box.setText(String.valueOf(Math.min(text, 255)));
+
+				try
+				{
+					text = Integer.parseInt(box.getText());
+				}
+				catch (NumberFormatException e)
+				{
+					text = Integer.parseInt(s);
+				}
+
 			}
-			else
-				box.setText("0");
+			box.setText(String.valueOf(Math.min(text, 255)));
 
 			StarTech.simpleNetworkWrapper.sendToServer(
 					new MessageChangeVoxel(new Color(Integer.parseInt(red.getText()), Integer.parseInt(green.getText()), Integer.parseInt(blue.getText())),
